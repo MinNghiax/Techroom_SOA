@@ -1,0 +1,47 @@
+.room-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+  padding: 20px;
+
+  .room-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: transform 0.3s;
+    cursor: pointer;
+
+    &:hover { transform: translateY(-5px); }
+
+    .card-image {
+      position: relative;
+      height: 200px;
+      img { width: 100%; height: 100%; object-fit: cover; }
+      .status-badge {
+        position: absolute;
+        top: 12px; right: 12px;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        &.available { background: #dcfce7; color: #166534; }
+        &.rented { background: #fee2e2; color: #991b1b; }
+      }
+    }
+
+    .card-body {
+      padding: 20px;
+      .room-name { margin: 0; font-size: 1.1rem; font-weight: 700; }
+      .address { color: var(--text-muted); font-size: 0.85rem; margin: 8px 0; }
+      .room-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 15px;
+        .price { color: var(--primary); font-weight: 700; font-size: 1.1rem; }
+      }
+    }
+  }
+}

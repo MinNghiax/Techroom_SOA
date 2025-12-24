@@ -1,0 +1,43 @@
+<div class="container">
+  <div class="list-header">
+    <div class="title-area">
+      <h1>Danh sách phòng trọ</h1>
+      <p>Tìm kiếm không gian sống lý tưởng của bạn tại Techroom</p>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-state">
+    <p>Đang tải danh sách phòng...</p>
+  </div>
+
+  <div class="room-grid" *ngIf="!isLoading">
+    <div class="room-card" *ngFor="let room of rooms" [routerLink]="['/rooms', room.id]">
+      <div class="card-image">
+        <img [src]="room.imageUrls && room.imageUrls.length > 0 ? room.imageUrls[0] : 'assets/images/no-image.jpg'" alt="{{room.name}}">
+        <div class="status-badge" [ngClass]="room.status.toLowerCase()">
+          {{ room.status === 'AVAILABLE' ? 'Còn trống' : 'Đã thuê' }}
+        </div>
+      </div>
+      
+      <div class="card-body">
+        <h3 class="room-name">{{ room.name }}</h3>
+        <p class="building-name"><i class="icon-building"></i> {{ room.buildingName }}</p>
+        <p class="address">{{ room.address }}</p>
+        
+        <div class="room-meta">
+          <span class="area"><strong>{{ room.area }}</strong> m²</span>
+          <span class="price">{{ room.price | currency:'VND':'symbol':'1.0-0' }}/tháng</span>
+        </div>
+        
+        <div class="amenities-preview" *ngIf="room.amenities && room.amenities.length > 0">
+          <span *ngFor="let am of room.amenities | slice:0:3" class="am-item">{{ am }}</span>
+          <span *ngIf="room.amenities.length > 3" class="am-more">+{{ room.amenities.length - 3 }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="!isLoading && rooms.length === 0">
+    <p>Hiện tại không có phòng nào phù hợp.</p>
+  </div>
+</div>

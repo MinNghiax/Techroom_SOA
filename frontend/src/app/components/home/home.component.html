@@ -1,0 +1,58 @@
+<div class="landing-page">
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Tìm kiếm không gian sống <br><span class="highlight">Thông minh & Hiện đại</span></h1>
+      <p>Techroom giúp bạn tìm kiếm, đặt phòng và quản lý hợp đồng thuê nhà chỉ trong vài cú click.</p>
+      <div class="hero-actions">
+        <button class="btn-main" routerLink="/rooms">Khám phá ngay</button>
+        <button class="btn-sub" routerLink="/register">Trở thành chủ nhà</button>
+      </div>
+    </div>
+    <div class="hero-image">
+      <img src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80" alt="Modern Room">
+    </div>
+  </section>
+
+  <section class="stats">
+    <div class="stat-item"><strong>500+</strong> <span>Phòng trống</span></div>
+    <div class="stat-item"><strong>100+</strong> <span>Tòa nhà</span></div>
+    <div class="stat-item"><strong>1000+</strong> <span>Khách thuê</span></div>
+  </section>
+
+  <section class="features">
+    <h2>Tại sao chọn Techroom?</h2>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="icon">🔍</div>
+        <h3>Tìm kiếm thông minh</h3>
+        <p>Lọc theo giá, vị trí và tiện ích cực kỳ nhanh chóng qua API Gateway.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">📜</div>
+        <h3>Hợp đồng trực tuyến</h3>
+        <p>Mọi thỏa thuận đều được số hóa và quản lý bởi Booking Service.</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">⭐</div>
+        <h3>Đánh giá thật</h3>
+        <p>Cộng đồng Techroom đánh giá giúp bạn chọn được căn phòng ưng ý nhất.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="featured-rooms container">
+    <div class="section-header">
+      <h2>Phòng mới cập nhật</h2>
+      <a routerLink="/rooms" class="view-all">Xem tất cả →</a>
+    </div>
+    <div class="room-grid">
+      <div class="room-card" *ngFor="let room of featuredRooms" [routerLink]="['/rooms', room.id]">
+        <img [src]="room.imageUrls[0]" alt="Room">
+        <div class="card-info">
+          <h4>{{ room.name }}</h4>
+          <p>{{ room.price | currency:'VND' }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

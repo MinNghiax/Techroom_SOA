@@ -1,0 +1,33 @@
+<div class="admin-container">
+  <div class="header-actions">
+    <div>
+      <h1>Tòa nhà của tôi</h1>
+      <p>Quản lý danh sách các khu nhà trọ đang sở hữu</p>
+    </div>
+    <button class="btn-add">+ Thêm tòa nhà mới</button>
+  </div>
+
+  <div class="building-grid">
+    <div class="b-card" *ngFor="let b of buildings">
+      <img [src]="b.image" alt="building">
+      <div class="b-content">
+        <h3>{{ b.name }}</h3>
+        <p class="addr">📍 {{ b.address }}</p>
+        <div class="b-stats">
+          <div class="stat">
+            <span>Tổng phòng</span>
+            <strong>{{ b.totalRooms }}</strong>
+          </div>
+          <div class="stat">
+            <span>Đang thuê</span>
+            <strong class="highlight">{{ b.activeRooms }}</strong>
+          </div>
+        </div>
+        <div class="b-actions">
+          <button class="btn-outline">Chi tiết</button>
+          <button class="btn-text">Chỉnh sửa</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

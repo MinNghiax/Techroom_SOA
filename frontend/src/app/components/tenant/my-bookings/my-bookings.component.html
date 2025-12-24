@@ -1,0 +1,23 @@
+<div class="container">
+  <div class="page-header">
+    <h1>Phòng đã đặt của bạn</h1>
+    <p>Theo dõi trạng thái và thời hạn hợp đồng các phòng trọ đã đặt.</p>
+  </div>
+
+  <div class="booking-list">
+    <div class="booking-card" *ngFor="let b of bookings">
+      <div class="booking-info">
+        <h3>{{ b.roomName }}</h3>
+        <p class="building">🏢 {{ b.building }}</p>
+        <div class="dates">
+          <span>Từ: <strong>{{ b.startDate | date:'dd/MM/yyyy' }}</strong></span>
+          <span>Đến: <strong>{{ b.endDate | date:'dd/MM/yyyy' }}</strong></span>
+        </div>
+      </div>
+      <div class="booking-meta">
+        <span class="price">{{ b.price | currency:'VND' }}</span>
+        <span class="status-badge" [ngClass]="b.status.toLowerCase()">{{ b.status }}</span>
+      </div>
+    </div>
+  </div>
+</div>

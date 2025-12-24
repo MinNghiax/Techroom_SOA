@@ -1,0 +1,32 @@
+<div class="container">
+  <div class="page-header">
+    <h1>Hệ thống tòa nhà Techroom</h1>
+    <p>Danh sách các khu vực lưu trú tập trung với tiện ích đa dạng</p>
+  </div>
+
+  <div *ngIf="isLoading" class="loader-box">Đang tải dữ liệu...</div>
+
+  <div class="building-grid" *ngIf="!isLoading">
+    <div class="building-card" *ngFor="let b of buildings">
+      <div class="card-icon">🏢</div>
+      <div class="card-info">
+        <h3>{{ b.name }}</h3>
+        <p class="location">
+          <strong>Địa chỉ:</strong> {{ b.address }}, {{ b.districtName }}, {{ b.provinceName }}
+        </p>
+        <p class="description" *ngIf="b.description">
+          {{ b.description }}
+        </p>
+      </div>
+      <div class="card-action">
+        <button class="btn-view" [routerLink]="['/rooms']" [queryParams]="{buildingId: b.id}">
+          Xem các phòng
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="!isLoading && buildings.length === 0">
+    Chưa có dữ liệu tòa nhà nào.
+  </div>
+</div>

@@ -1,0 +1,43 @@
+<nav class="navbar">
+  <div class="container">
+    <div class="logo" routerLink="/">
+      <span class="tech">TECH</span><span class="room">ROOM</span>
+    </div>
+
+    <ul class="nav-links">
+        <li><a routerLink="/rooms">Tìm phòng</a></li>
+
+        <li *ngIf="getRole() === 'TENANT'">
+            <a routerLink="/my-bookings">Phòng đã đặt</a>
+        </li>
+
+        <li *ngIf="getRole() === 'LANDLORD'">
+            <a routerLink="/landlord/manage-rooms">Quản lý phòng trọ</a>
+        </li>
+        <li *ngIf="getRole() === 'LANDLORD'">
+            <a routerLink="/landlord/manage-buildings">Tòa nhà của tôi</a>
+        </li>
+
+        <li *ngIf="getRole() === 'ADMIN'">
+            <a routerLink="/admin/users">Quản lý người dùng</a>
+        </li>
+        <li *ngIf="getRole() === 'ADMIN'">
+            <a routerLink="/admin/statistics">Thống kê hệ thống</a>
+        </li>
+    </ul>
+
+    <div class="auth-section">
+      <ng-container *ngIf="!authService.isAuthenticated(); else loggedIn">
+        <a routerLink="/login" class="btn-text">Đăng nhập</a>
+        <a routerLink="/register" class="btn-primary">Đăng ký</a>
+      </ng-container>
+
+      <ng-template #loggedIn>
+        <div class="user-info">
+          <span class="welcome">Chào, <strong>{{ getUsername() }}</strong></span>
+          <button (click)="onLogout()" class="btn-outline">Đăng xuất</button>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</nav>

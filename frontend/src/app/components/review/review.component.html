@@ -1,0 +1,42 @@
+<div class="review-wrapper">
+  <div class="write-review-card">
+    <h3>Để lại đánh giá của bạn</h3>
+    <div class="star-picker">
+      <span *ngFor="let s of stars" 
+            (click)="setRating(s)" 
+            [class.active]="s <= newReview.rating">★</span>
+      <span class="rating-label">{{ newReview.rating }}/5 sao</span>
+    </div>
+    <textarea [(ngModel)]="newReview.comment" placeholder="Cảm nhận của bạn về căn phòng này..."></textarea>
+    <button (click)="submitReview()" [disabled]="isSubmitting">
+      {{ isSubmitting ? 'Đang gửi...' : 'Gửi đánh giá' }}
+    </button>
+  </div>
+
+  <hr class="divider">
+
+  <div class="review-list-section">
+    <h3>Đánh giá từ cộng đồng ({{ reviews.length }})</h3>
+    
+    <div class="empty-msg" *ngIf="reviews.length === 0">
+      Chưa có đánh giá nào. Hãy là người đầu tiên trải nghiệm!
+    </div>
+
+    <div class="review-item" *ngFor="let r of reviews">
+      <div class="rev-header">
+        <div class="user-info">
+          <div class="avatar">{{ r.username.charAt(0) || 'U' }}</div>
+          <div>
+            <div class="name">{{ r.username }}</div>
+            <div class="date">{{ r.createAt | date:'dd/MM/yyyy' }}</div>
+          </div>
+        </div>
+        <div class="rev-stars">
+          <span class="filled" *ngFor="let s of getStarsArray(r.rating)">★</span>
+          <span *ngFor="let s of getStarsArray(5 - r.rating)">★</span>
+        </div>
+      </div>
+      <p class="comment">{{ r.comment }}</p>
+    </div>
+  </div>
+</div>

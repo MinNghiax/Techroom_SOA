@@ -1,0 +1,27 @@
+.review-wrapper {
+  .write-review-card {
+    background: #f8fafc;
+    padding: 24px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    
+    .star-picker span {
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #cbd5e1;
+      &.active { color: #fbbf24; }
+    }
+  }
+
+  .review-item {
+    padding: 20px 0;
+    border-bottom: 1px solid #f1f5f9;
+    .rev-header {
+      display: flex;
+      justify-content: space-between;
+      .user-info { display: flex; align-items: center; gap: 12px; }
+      .avatar { background: var(--primary); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; }
+    }
+    .comment { margin-top: 10px; color: var(--text-main); }
+  }
+}

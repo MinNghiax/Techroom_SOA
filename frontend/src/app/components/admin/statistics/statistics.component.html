@@ -1,0 +1,72 @@
+<div class="stats-wrapper">
+  <header class="stats-header">
+    <div class="title-box">
+      <h1>Báo cáo tổng quan hệ thống</h1>
+      <p>Số liệu được tổng hợp từ danh sách người dùng thực tế</p>
+    </div>
+    <button class="btn-refresh-text" (click)="calculateStats()">Cập nhật số liệu</button>
+  </header>
+
+  @if (isLoading) {
+    <div class="loading-container">
+      <div class="loader-bar"></div>
+      <p>Đang phân tích dữ liệu...</p>
+    </div>
+  } @else {
+    
+    <div class="stats-grid">
+      <div class="stat-card blue">
+        <span class="card-label">Tổng thành viên</span>
+        <div class="card-value">{{ stats.total }}</div>
+        <div class="card-footer">Người dùng đã đăng ký</div>
+      </div>
+
+      <div class="stat-card">
+        <span class="card-label">Chủ cho thuê</span>
+        <div class="card-value">{{ stats.landlords }}</div>
+        <div class="card-footer">Landlord đối tác</div>
+      </div>
+
+      <div class="stat-card">
+        <span class="card-label">Người tìm phòng</span>
+        <div class="card-value">{{ stats.tenants }}</div>
+        <div class="card-footer">Tenant đang hoạt động</div>
+      </div>
+
+      <div class="stat-card">
+        <span class="card-label">Ban quản trị</span>
+        <div class="card-value">{{ stats.admins }}</div>
+        <div class="card-footer">Tài khoản ADMIN</div>
+      </div>
+    </div>
+
+    <div class="details-row">
+      <div class="detail-box">
+        <h3>Tỷ lệ tài khoản hoạt động</h3>
+        <div class="progress-section">
+          <div class="progress-info">
+            <span>{{ stats.active }} đang hoạt động / {{ stats.total }} tổng số</span>
+            <strong>{{ stats.activeRate }}%</strong>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" [style.width.%]="stats.activeRate"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-box">
+        <h3>Tình trạng bảo mật</h3>
+        <div class="status-summary">
+          <div class="status-item">
+            <span class="text-green">Hoạt động bình thường</span>
+            <strong>{{ stats.active }}</strong>
+          </div>
+          <div class="status-item">
+            <span class="text-red">Đã bị khóa (Banned)</span>
+            <strong>{{ stats.banned }}</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

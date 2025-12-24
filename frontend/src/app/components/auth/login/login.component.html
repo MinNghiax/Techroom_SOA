@@ -1,0 +1,47 @@
+<div class="auth-container">
+  <div class="login-card">
+    <div class="header">
+      <h2>Chào mừng trở lại</h2>
+      <p>Đăng nhập để quản lý Techroom của bạn</p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+      <div class="alert error" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <div class="form-group">
+        <label for="username">Tên đăng nhập</label>
+        <input 
+          type="text" 
+          id="username" 
+          name="username" 
+          [(ngModel)]="loginData.username" 
+          required 
+          placeholder="Nhập username của bạn"
+          #username="ngModel">
+      </div>
+
+      <div class="form-group">
+        <label for="password">Mật khẩu</label>
+        <input 
+          type="password" 
+          id="password" 
+          name="password" 
+          [(ngModel)]="loginData.password" 
+          required 
+          placeholder="••••••••"
+          #password="ngModel">
+      </div>
+
+      <button type="submit" [disabled]="!loginForm.valid || isLoading" class="btn-login">
+        <span *ngIf="!isLoading">Đăng nhập</span>
+        <span *ngIf="isLoading" class="loader"></span>
+      </button>
+    </form>
+
+    <div class="footer">
+      <p>Chưa có tài khoản? <a routerLink="/register">Đăng ký ngay</a></p>
+    </div>
+  </div>
+</div>

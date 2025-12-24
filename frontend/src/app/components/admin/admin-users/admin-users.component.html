@@ -1,0 +1,128 @@
+<div class="admin-view">
+  <div class="view-header">
+    <div class="title-group">
+      <h1>Hệ thống quản lý người dùng</h1>
+      <p>Tổng số: <strong>{{ users.length }}</strong> thành viên</p>
+    </div>
+
+    <div class="filter-tools">
+      <div class="search-field">
+        <input 
+          type="text" 
+          placeholder="Tìm tên, email hoặc tài khoản..." 
+          [(ngModel)]="searchTerm"
+          (input)="onSearch()">
+      </div>
+      <button class="btn-secondary" (click)="loadUsers()">Làm mới dữ liệu</button>
+    </div>
+  </div>
+
+  <div class="view-content">
+    @if (isLoading) {
+      <div class="feedback-box">
+        <div class="loading-spinner"></div>
+        <p>Đang tải danh sách thành viên...</p>
+      </div>
+    } @else {
+      @if (filteredUsers.length > 0) {
+        <div class="data-wrapper">
+          <table class="user-list-table">
+            <thead>
+              <tr>
+                <th>Thông tin định danh</th>
+                <th>Vai trò</th>
+                <th>Liên hệ</th>
+                <th>Trạng thái</th>
+                <th class="actions-col">Xử lý</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (user of filteredUsers; track user.id) {
+                <tr [class.row-inactive]="user.status === 'BANNED'">
+                  <td>
+                    <div class="identity-group">
+                      <span class="full-name">{{ user.fullName }}</span>
+                      <span class="user-meta">Mã: {{ user.id }} | Tài khoản: {{ user.username }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="role-tag" [ngClass]="getRoleLabel(user.role)">
+                      {{ getRoleLabel(user.role) }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="contact-group">
+                      <span class="email">{{ user.email }}</span>
+                      <span class="phone">{{ user.phone }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="status-badge" [class.active]="user.status === 'ACTIVE'">
+                      {{ user.status === 'ACTIVE' ? 'Hoạt động' : 'Đã khóa' }}
+                    </span>
+                  </td>
+                  <td class="actions-col">
+                    <div class="button-group">
+                      <button class="btn-small btn-edit" (click)="openEditModal(user)">Sửa</button>
+                      
+                      @if (user.status === 'ACTIVE') {
+                        <button class="btn-small btn-lock" (click)="toggleUserStatus(user)">Khóa</button>
+                      } @else {
+                        <button class="btn-small btn-unlock" (click)="toggleUserStatus(user)">Mở khóa</button>
+                      }
+                      
+                      <button class="btn-small btn-delete" (click)="onDelete(user.id)">Xóa</button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <div class="feedback-box">
+          <p>Không tìm thấy thành viên nào khớp với tìm kiếm.</p>
+        </div>
+      }
+    }
+  </div>
+
+  @if (isEditModalOpen) {
+    <div class="modal-backdrop">
+      <div class="modal-container">
+        <div class="modal-header">
+          <h2>Chỉnh sửa thông tin thành viên</h2>
+          <button class="btn-close-text" (click)="closeEditModal()">Đóng</button>
+        </div>
+        
+        <div class="modal-body">
+          <div class="field-group">
+            <label>Họ và tên</label>
+            <input type="text" [(ngModel)]="editData.fullName">
+          </div>
+          <div class="field-group">
+            <label>Email liên hệ</label>
+            <input type="email" [(ngModel)]="editData.email">
+          </div>
+          <div class="field-group">
+            <label>Số điện thoại</label>
+            <input type="text" [(ngModel)]="editData.phone">
+          </div>
+          <div class="field-group">
+            <label>Vai trò thành viên</label>
+            <select [(ngModel)]="editData.role">
+              <option [value]="0">Quản trị viên (ADMIN)</option>
+              <option [value]="1">Chủ cho thuê (LANDLORD)</option>
+              <option [value]="2">Người tìm phòng (TENANT)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-cancel" (click)="closeEditModal()">Hủy bỏ</button>
+          <button class="btn-save" (click)="onSaveUpdate()">Lưu thay đổi</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

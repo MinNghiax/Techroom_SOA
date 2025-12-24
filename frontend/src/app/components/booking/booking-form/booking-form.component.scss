@@ -1,0 +1,41 @@
+$primary: #2563eb;
+
+.booking-form {
+  h4 { margin: 0 0 20px; color: #1e293b; font-size: 1.1rem; }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+    label { display: block; font-size: 0.8rem; color: #64748b; margin-bottom: 5px; font-weight: 500; }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      &:focus { border-color: $primary; outline: none; }
+    }
+  }
+
+  .btn-primary {
+    width: 100%;
+    background: $primary;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.2s;
+
+    &:disabled { background: #94a3b8; cursor: not-allowed; }
+    &:hover:not(:disabled) { background: #1d4ed8; }
+  }
+}

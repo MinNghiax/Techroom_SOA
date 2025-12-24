@@ -1,0 +1,15 @@
+<div class="booking-card">
+  <h2>Create Booking</h2>
+  <form (ngSubmit)="onBook()">
+    <div>
+      <input name="roomId" type="number" [(ngModel)]="bookingData.roomId" readonly>
+    </div>
+    <div>
+      <input name="start" type="date" [(ngModel)]="bookingData.startDate" required>
+    </div>
+    <div>
+      <input name="end" type="date" [(ngModel)]="bookingData.endDate" required>
+    </div>
+    <button type="submit">Book Now</button>
+  </form>
+</div>

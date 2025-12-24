@@ -1,0 +1,52 @@
+<div class="container" *ngIf="room">
+  <div class="main-layout">
+    <div class="content-column">
+      <div class="gallery">
+        <img [src]="room.imageUrls[0]" class="main-img">
+        <div class="thumb-grid">
+          <img *ngFor="let img of room.imageUrls | slice:1" [src]="img">
+        </div>
+      </div>
+
+      <div class="info-section">
+        <div class="badge">{{ room.buildingName }}</div>
+        <h1>{{ room.name }}</h1>
+        <p class="location"><i class="icon-pin"></i> {{ room.address }}</p>
+        
+        <div class="specs">
+          <div class="spec-item"><span>Diện tích</span> <strong>{{ room.area }} m²</strong></div>
+          <div class="spec-item"><span>Trạng thái</span> <strong [class]="room.status.toLowerCase()">{{ room.status }}</strong></div>
+        </div>
+
+        <div class="description">
+          <h3>Mô tả chi tiết</h3>
+          <p>{{ room.description }}</p>
+        </div>
+
+        <div class="amenities">
+          <h3>Tiện ích</h3>
+          <ul>
+            <li *ngFor="let am of room.amenities">{{ am }}</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="review-section">
+        <app-review 
+          [roomId]="room.id" 
+          [reviews]="reviews" 
+          (reviewAdded)="loadReviews(room.id)">
+        </app-review>
+      </div>
+    </div>
+
+    <div class="sidebar-column">
+      <div class="sticky-card">
+        <div class="price-box">
+          <span class="price">{{ room.price | currency:'VND' }}</span>/tháng
+        </div>
+        <app-booking-form [roomId]="room.id"></app-booking-form>
+      </div>
+    </div>
+  </div>
+</div>
