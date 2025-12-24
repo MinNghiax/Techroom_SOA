@@ -1,0 +1,56 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+      # ==== Cấu hình CORS cho Frontend (Angular/React) ====
+      globalcors:
+        add-to-simple-url-handler-mapping: true
+        corsConfigurations:
+          "[/**]":
+            allowedOrigins:
+              - "http://localhost:4200"
+            allowedMethods:
+              - "*"
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+
+      # ==== Định tuyến tới các Service thông qua Eureka ====
+      routes:
+
+        # 1. AUTH SERVICE (Port 8081) - Xử lý Login, Register, User
+        - id: auth-service
+          uri: lb://AUTH-SERVICE
+          predicates:
+            - Path=/api/auth/**, /api/users/**, /api/landlord-registration/**, /api/admin/**
+
+        # 2. ROOM SERVICE (Port 8082) - Quản lý phòng, tòa nhà, vị trí, review
+        - id: room-service
+          uri: lb://ROOM-SERVICE
+          predicates:
+            - Path=/api/rooms/**, /api/buildings/**, /api/locations/**, /api/reviews/**
+
+        # 3. BOOKING SERVICE (Port 8083) - Đặt phòng, hợp đồng, thanh toán
+        - id: booking-service
+          uri: lb://BOOKING-SERVICE
+          predicates:
+            - Path=/api/bookings/**, /api/payments/**
+
+      # ==== Xử lý lỗi trùng lặp Header khi qua Gateway ====
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
+
+# ==== Kết nối với Discovery Server (Eureka) ====
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
