@@ -34,6 +34,15 @@ public class RoomService {
         return mapToResponse(room);
     }
 
+    // Thêm phương thức này vào RoomService
+    public List<RoomResponse> getRoomsByLandlord() {
+        // Giả sử bạn lấy username từ SecurityContext hoặc truyền từ Controller vào
+        // Logic: Tìm các Building thuộc sở hữu của Landlord -> Tìm Rooms thuộc các Building đó
+        return roomRepository.findAll().stream() // Thay bằng query lọc theo Landlord thực tế
+                .map(this::mapToResponse)
+                .toList();
+    }
+
     // 3. Chức năng Landlord tạo phòng mới (MỚI)
     @Transactional
     public RoomResponse createRoom(RoomRequest request) {

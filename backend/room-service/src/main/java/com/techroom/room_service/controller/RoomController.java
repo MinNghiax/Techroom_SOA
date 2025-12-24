@@ -38,6 +38,14 @@ public class RoomController {
         return ResponseEntity.ok(roomService.getRoomById(id));
     }
 
+    // Thêm endpoint này vào RoomController
+    @GetMapping("/landlord")
+    public ResponseEntity<List<RoomResponse>> getRoomsByLandlord() {
+        // Trong thực tế, bạn sẽ lấy username từ SecurityContextHolder
+        // Ở đây tôi giả định Service sẽ xử lý việc lấy user hiện tại
+        return ResponseEntity.ok(roomService.getRoomsByLandlord());
+    }
+
     /**
      * 3. API Tạo phòng mới (Cho Landlord)
      * POST /api/rooms

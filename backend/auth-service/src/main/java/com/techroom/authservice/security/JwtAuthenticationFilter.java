@@ -30,26 +30,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
+        try {
+            String token = getTokenFromRequest(request);
 
-        // Lấy token từ header
-        String token = getTokenFromRequest(request);
+            // Chỉ xử lý nếu token thực sự có nội dung và hợp lệ
+            if (StringUtils.hasText(token) && tokenProvider.validateToken(token)) {
+                String username = tokenProvider.getUsername(token);
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-        // Validate token
-        if (StringUtils.hasText(token) && tokenProvider.validateToken(token)) {
-            // Lấy username từ token
-            String username = tokenProvider.getUsername(token);
-
-            // Load user details
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-            // Set authentication vào context
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                    userDetails,
-                    null,
-                    userDetails.getAuthorities()
-            );
-            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities()
+                );
+                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            }
+        } catch (Exception e) {
+            // Nếu token lỗi, chỉ đơn giản là không set Authentication vào Context
+            // Không ném ngoại lệ để request có thể đi tiếp đến các API permitAll()
+            logger.error("Could not set user authentication in security context", e);
         }
 
         filterChain.doFilter(request, response);

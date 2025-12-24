@@ -32,8 +32,10 @@ public class AuthController {
 
     // API Đăng ký
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody RegisterRequest registerRequest) {
-        return ResponseEntity.ok(authService.register(registerRequest));
+    public ResponseEntity<?> register(@RequestBody RegisterRequest registerRequest) {
+        String message = authService.register(registerRequest);
+        // Trả về JSON dạng: {"message": "User registered successfully!"}
+        return ResponseEntity.ok(java.util.Map.of("message", message));
     }
 
     // API Cấp lại Token mới
