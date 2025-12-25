@@ -5,7 +5,7 @@ import { RoomService } from '../../services/room.service';
 import { ReviewService } from '../../services/review.service';
 import { RoomResponse } from '../../models/room.model';
 import { BookingFormComponent } from '../booking/booking-form/booking-form.component';
-import { ReviewComponent } from '../review/review.component'; // Ensure this matches your folder structure
+import { ReviewComponent } from '../review/review.component';
 
 @Component({
   selector: 'app-room-detail',
@@ -14,7 +14,7 @@ import { ReviewComponent } from '../review/review.component'; // Ensure this mat
     CommonModule, 
     RouterModule,
     BookingFormComponent,
-    ReviewComponent // Added comma and included the component correctly
+    ReviewComponent
   ],
   templateUrl: './room-detail.component.html',
   styleUrls: ['./room-detail.component.scss']
@@ -23,6 +23,7 @@ export class RoomDetailComponent implements OnInit {
   room?: RoomResponse;
   reviews: any[] = [];
   isLoading = true;
+  readonly baseUrl = 'http://localhost:8080';
 
   constructor(
     private route: ActivatedRoute,
@@ -50,5 +51,10 @@ export class RoomDetailComponent implements OnInit {
 
   loadReviews(roomId: number) {
     this.reviewService.getByRoom(roomId).subscribe(res => this.reviews = res);
+  }
+
+  getImgUrl(url: string): string {
+    if (!url) return 'assets/images/no-image.jpg';
+    return url.startsWith('http') ? url : `${this.baseUrl}${url}`;
   }
 }

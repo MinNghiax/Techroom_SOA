@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RoomService } from '../../../services/room.service';
-import { RoomResponse, RoomRequest } from '../../../models/room.model';
+import { BuildingService } from '../../../services/building.service';
+import { RoomResponse, RoomRequest, Amenity } from '../../../models/room.model';
 
 @Component({
   selector: 'app-manage-rooms',
@@ -13,85 +14,151 @@ import { RoomResponse, RoomRequest } from '../../../models/room.model';
 })
 export class ManageRoomsComponent implements OnInit {
   rooms: RoomResponse[] = [];
+  buildings: any[] = [];
+  allAmenities: Amenity[] = [];
   isLoading = true;
-  
-  // Modal State
   isModalOpen = false;
   isEditMode = false;
   selectedRoomId: number | null = null;
 
-  // Form Data
+  selectedFiles: File[] = [];
+  imagePreviews: any[] = [];
+  readonly baseUrl = 'http://localhost:8080';
+
   roomForm: RoomRequest = {
-    buildingId: 0,
-    name: '',
-    price: 0,
-    area: 0,
-    status: 'AVAILABLE',
-    description: '',
-    amenityIds: []
+    buildingId: 0, name: '', price: 0, area: 0,
+    status: 'AVAILABLE', description: '', amenityIds: [], imageUrls: []
   };
 
-  constructor(private roomService: RoomService) {}
+  constructor(private roomService: RoomService, private buildingService: BuildingService) {}
 
   ngOnInit(): void {
+    this.loadBuildings();
     this.loadRooms();
+    this.loadAmenities();
+  }
+
+  loadBuildings() {
+    const landlordId = Number(localStorage.getItem('userId'));
+    if (landlordId) {
+      this.buildingService.getBuildingsByLandlord(landlordId).subscribe(data => this.buildings = data);
+    }
   }
 
   loadRooms() {
     this.isLoading = true;
     this.roomService.getRoomsByLandlord().subscribe({
-      next: (data) => {
-        this.rooms = data;
-        this.isLoading = false;
-      },
+      next: (data) => { this.rooms = data; this.isLoading = false; },
       error: () => this.isLoading = false
     });
   }
 
+  loadAmenities() {
+    this.roomService.getAllAmenities().subscribe(data => this.allAmenities = data);
+  }
+
+  toggleAmenity(amenityId: number) {
+    if (!this.roomForm.amenityIds) this.roomForm.amenityIds = [];
+    const index = this.roomForm.amenityIds.indexOf(amenityId);
+    if (index > -1) {
+      this.roomForm.amenityIds.splice(index, 1);
+    } else {
+      this.roomForm.amenityIds.push(amenityId);
+    }
+  }
+
+  addNewAmenity() {
+    const name = prompt('Nhập tên tiện ích mới:');
+    if (name && name.trim()) {
+      this.roomService.createAmenity({ name: name.trim() }).subscribe(res => {
+        this.allAmenities.push(res);
+        if (res.id) {
+          if (!this.roomForm.amenityIds) this.roomForm.amenityIds = [];
+          this.roomForm.amenityIds.push(res.id);
+        }
+      });
+    }
+  }
+
+  onFileSelected(event: any) {
+    const files = event.target.files;
+    if (files) {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        this.selectedFiles.push(file);
+        const reader = new FileReader();
+        reader.onload = (e: any) => this.imagePreviews.push(e.target.result);
+        reader.readAsDataURL(file);
+      }
+    }
+  }
+
+  removeImage(index: number, isNew: boolean) {
+    this.imagePreviews.splice(index, 1);
+    if (isNew) this.selectedFiles.splice(index, 1);
+  }
+
   openAddModal() {
     this.isEditMode = false;
-    this.roomForm = { buildingId: 1, name: '', price: 0, area: 0, status: 'AVAILABLE', description: '', amenityIds: [] };
+    this.selectedRoomId = null;
+    this.selectedFiles = [];
+    this.imagePreviews = [];
+    const defaultId = this.buildings.length > 0 ? this.buildings[0].id : 0;
+    this.roomForm = { 
+      buildingId: defaultId, name: '', price: 0, area: 0, 
+      status: 'AVAILABLE', description: '', amenityIds: [], imageUrls: [] 
+    };
     this.isModalOpen = true;
   }
 
   openEditModal(room: RoomResponse) {
     this.isEditMode = true;
     this.selectedRoomId = room.id;
-    // Map từ Response sang Request
+    this.selectedFiles = [];
+    this.imagePreviews = room.imageUrls ? room.imageUrls.map(url => url.startsWith('http') ? url : `${this.baseUrl}${url}`) : [];
+    
+    // FIX: Map ID từ danh sách object amenities trả về từ Backend
+    const currentAmenityIds = room.amenities ? room.amenities.map((a: any) => a.id) : [];
+
     this.roomForm = {
-      buildingId: 1, // Giả định lấy từ buildingName hoặc API khác
+      buildingId: room.buildingId,
       name: room.name,
       price: room.price,
       area: room.area,
       status: room.status,
-      description: room.description, 
-      amenityIds: []
+      description: room.description || '',
+      amenityIds: currentAmenityIds, // Bây giờ mảng này sẽ có ID [1, 2...]
+      imageUrls: room.imageUrls || []
     };
     this.isModalOpen = true;
   }
 
   saveRoom() {
     if (this.isEditMode && this.selectedRoomId) {
-      this.roomService.updateRoom(this.selectedRoomId, this.roomForm).subscribe(() => {
-        this.loadRooms();
-        this.isModalOpen = false;
-      });
+      this.roomService.updateRoom(this.selectedRoomId, this.roomForm, this.selectedFiles).subscribe(() => this.onSuccess());
     } else {
-      this.roomService.createRoom(this.roomForm).subscribe(() => {
-        this.loadRooms();
-        this.isModalOpen = false;
-      });
+      this.roomService.createRoom(this.roomForm, this.selectedFiles).subscribe(() => this.onSuccess());
     }
   }
 
+  onSuccess() {
+    this.loadRooms();
+    this.isModalOpen = false;
+    this.selectedFiles = [];
+    this.imagePreviews = [];
+    alert('Thành công!');
+  }
+
   deleteRoom(id: number) {
-    if (confirm('Xác nhận xóa vĩnh viễn phòng này?')) {
+    if (confirm('Xác nhận xóa phòng này?')) {
       this.roomService.deleteRoom(id).subscribe(() => this.loadRooms());
     }
   }
 
-  getStatusLabel(status: string): string {
-    const map: any = { 'AVAILABLE': 'Còn trống', 'OCCUPIED': 'Đã thuê', 'REPAIRING': 'Đang sửa' };
-    return map[status] || status;
+  getStatusLabel(s: string) {
+    const m: any = { 'AVAILABLE': 'Còn trống', 'OCCUPIED': 'Đã thuê', 'REPAIRING': 'Đang sửa' };
+    return m[s] || s;
   }
+
+  trackByFn(index: any) { return index; }
 }

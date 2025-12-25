@@ -6,9 +6,8 @@ import { Observable, tap } from 'rxjs';
 export class AuthService {
   private authUrl = 'http://localhost:8080/api/auth';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
-  // Thêm phương thức này để sửa lỗi ts(2339)
   register(userData: any): Observable<any> {
     return this.http.post<any>(`${this.authUrl}/register`, userData);
   }
@@ -16,16 +15,21 @@ export class AuthService {
   login(credentials: any) {
   return this.http.post<any>(`${this.authUrl}/login`, credentials).pipe(
     tap(res => {
+      // Lưu các thông tin cũ của bạn
       localStorage.setItem('accessToken', res.accessToken);
       localStorage.setItem('username', res.username);
       localStorage.setItem('userId', res.userId);
 
-      // Chuyển đổi ID role số sang chuỗi để dễ đọc code
-      let roleName = '';
-      if (res.role === 0) roleName = 'ADMIN';
-      else if (res.role === 1) roleName = 'LANDLORD';
-      else roleName = 'TENANT'; // Mặc định là 2
-      
+      // BỔ SUNG DÒNG NÀY: Lưu họ tên thật vào localStorage
+      // res.fullName phải khớp chính xác với tên trường Backend trả về
+      if (res.fullName) {
+        localStorage.setItem('fullName', res.fullName);
+      } else {
+        console.warn('Backend không trả về trường fullName!');
+      }
+
+      // Logic xử lý role giữ nguyên
+      let roleName = res.role === 0 ? 'ADMIN' : (res.role === 1 ? 'LANDLORD' : 'TENANT');
       localStorage.setItem('userRole', roleName);
     })
   );
@@ -33,6 +37,10 @@ export class AuthService {
 
   isAuthenticated(): boolean {
     return !!localStorage.getItem('accessToken');
+  }
+
+  getRole(): string | null {
+    return localStorage.getItem('userRole'); // Ví dụ: 'ADMIN', 'LANDLORD', 'TENANT'
   }
 
   logout() {

@@ -2,9 +2,9 @@
   <div class="main-layout">
     <div class="content-column">
       <div class="gallery">
-        <img [src]="room.imageUrls[0]" class="main-img">
-        <div class="thumb-grid">
-          <img *ngFor="let img of room.imageUrls | slice:1" [src]="img">
+        <img [src]="getImgUrl(room.imageUrls[0])" class="main-img" *ngIf="room.imageUrls && room.imageUrls.length > 0">
+        <div class="thumb-grid" *ngIf="room.imageUrls && room.imageUrls.length > 1">
+          <img *ngFor="let img of room.imageUrls | slice:1" [src]="getImgUrl(img)">
         </div>
       </div>
 
@@ -15,19 +15,25 @@
         
         <div class="specs">
           <div class="spec-item"><span>Diện tích</span> <strong>{{ room.area }} m²</strong></div>
-          <div class="spec-item"><span>Trạng thái</span> <strong [class]="room.status.toLowerCase()">{{ room.status }}</strong></div>
+          <div class="spec-item">
+            <span>Trạng thái</span> 
+            <strong [class]="room.status.toLowerCase()">
+              {{ room.status === 'AVAILABLE' ? 'Còn trống' : (room.status === 'OCCUPIED' ? 'Đã thuê' : 'Đang sửa') }}
+            </strong>
+          </div>
         </div>
 
         <div class="description">
           <h3>Mô tả chi tiết</h3>
-          <p>{{ room.description }}</p>
+          <p>{{ room.description || 'Chưa có mô tả chi tiết cho phòng này.' }}</p>
         </div>
 
         <div class="amenities">
           <h3>Tiện ích</h3>
-          <ul>
-            <li *ngFor="let am of room.amenities">{{ am }}</li>
+          <ul *ngIf="room.amenities && room.amenities.length > 0">
+            <li *ngFor="let am of room.amenities">{{ am.name }}</li>
           </ul>
+          <p *ngIf="!room.amenities || room.amenities.length === 0">Không có tiện ích đi kèm.</p>
         </div>
       </div>
 
@@ -43,7 +49,7 @@
     <div class="sidebar-column">
       <div class="sticky-card">
         <div class="price-box">
-          <span class="price">{{ room.price | currency:'VND' }}</span>/tháng
+          <span class="price">{{ room.price | currency:'VND':'symbol':'1.0-0' }}</span>/tháng
         </div>
         <app-booking-form [roomId]="room.id"></app-booking-form>
       </div>

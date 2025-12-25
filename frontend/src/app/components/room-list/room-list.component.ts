@@ -14,6 +14,7 @@ import { RoomResponse } from '../../models/room.model';
 export class RoomListComponent implements OnInit {
   rooms: RoomResponse[] = [];
   isLoading = true;
+  readonly baseUrl = 'http://localhost:8080'; // Cần khớp với Backend của bạn
 
   constructor(private roomService: RoomService) {}
 
@@ -32,5 +33,11 @@ export class RoomListComponent implements OnInit {
         this.isLoading = false;
       }
     });
+  }
+
+  // Hàm bổ trợ để hiển thị ảnh đầy đủ đường dẫn
+  getImgUrl(url: string): string {
+    if (!url) return 'assets/images/no-image.jpg';
+    return url.startsWith('http') ? url : `${this.baseUrl}${url}`;
   }
 }

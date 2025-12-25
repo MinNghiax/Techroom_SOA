@@ -1,29 +1,32 @@
 <nav class="navbar">
   <div class="container">
-    <div class="logo" routerLink="/">
+    <a class="logo" 
+       routerLink="/" 
+       routerLinkActive="active" 
+       [routerLinkActiveOptions]="{exact: true}">
       <span class="tech">TECH</span><span class="room">ROOM</span>
-    </div>
+    </a>
 
     <ul class="nav-links">
-        <li><a routerLink="/rooms">Tìm phòng</a></li>
+      <li><a routerLink="/rooms" routerLinkActive="active">Tìm phòng</a></li>
 
-        <li *ngIf="getRole() === 'TENANT'">
-            <a routerLink="/my-bookings">Phòng đã đặt</a>
-        </li>
+      <li *ngIf="authService.getRole() === 'TENANT'">
+        <a routerLink="/my-bookings" routerLinkActive="active">Phòng đã đặt</a>
+      </li>
 
-        <li *ngIf="getRole() === 'LANDLORD'">
-            <a routerLink="/landlord/manage-rooms">Quản lý phòng trọ</a>
-        </li>
-        <li *ngIf="getRole() === 'LANDLORD'">
-            <a routerLink="/landlord/manage-buildings">Tòa nhà của tôi</a>
-        </li>
+      <li *ngIf="authService.getRole() === 'LANDLORD'">
+        <a routerLink="/landlord/manage-rooms" routerLinkActive="active">Quản lý phòng</a>
+      </li>
+      <li *ngIf="authService.getRole() === 'LANDLORD'">
+        <a routerLink="/landlord/manage-buildings" routerLinkActive="active">Tòa nhà của tôi</a>
+      </li>
 
-        <li *ngIf="getRole() === 'ADMIN'">
-            <a routerLink="/admin/users">Quản lý người dùng</a>
-        </li>
-        <li *ngIf="getRole() === 'ADMIN'">
-            <a routerLink="/admin/statistics">Thống kê hệ thống</a>
-        </li>
+      <li *ngIf="authService.getRole() === 'ADMIN'">
+        <a routerLink="/admin/users" routerLinkActive="active">Quản lý người dùng</a>
+      </li>
+      <li *ngIf="authService.getRole() === 'ADMIN'">
+        <a routerLink="/admin/statistics" routerLinkActive="active">Thống kê</a>
+      </li>
     </ul>
 
     <div class="auth-section">
@@ -33,9 +36,14 @@
       </ng-container>
 
       <ng-template #loggedIn>
-        <div class="user-info">
-          <span class="welcome">Chào, <strong>{{ getUsername() }}</strong></span>
-          <button (click)="onLogout()" class="btn-outline">Đăng xuất</button>
+        <div class="user-wrapper">
+          <div class="user-info">
+            <div class="avatar-circle">{{ getFullName().charAt(0).toUpperCase() }}</div>
+            <span class="welcome">Chào, <strong>{{ getFullName() }}</strong></span>
+          </div>
+          <button (click)="onLogout()" class="btn-logout">
+            <span>Đăng xuất</span>
+          </button>
         </div>
       </ng-template>
     </div>

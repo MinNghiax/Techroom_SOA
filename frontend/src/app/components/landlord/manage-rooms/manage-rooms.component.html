@@ -2,111 +2,129 @@
   <header class="page-header">
     <div class="header-text">
       <h1>Quản lý phòng trọ</h1>
-      <p>Cập nhật thông tin, giá cả và trạng thái thuê phòng</p>
+      <p>Cập nhật thông tin, trạng thái và hình ảnh thực tế</p>
     </div>
     <button class="btn-primary" (click)="openAddModal()">+ Thêm phòng mới</button>
   </header>
 
   <main class="content-area">
-    @if (isLoading) {
-      <div class="loading-box">Đang đồng bộ danh sách phòng...</div>
-    } @else {
-      <div class="table-wrapper">
-        <table class="room-table">
-          <thead>
-            <tr>
-              <th>Tên phòng & Tòa nhà</th>
-              <th>Diện tích</th>
-              <th>Giá thuê</th>
-              <th>Trạng thái</th>
-              <th class="text-right">Thao tác</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (room of rooms; track room.id) {
-              <tr>
-                <td>
-                  <div class="room-info">
-                    <span class="room-name">{{ room.name }}</span>
-                    <span class="b-name">{{ room.buildingName }}</span>
-                  </div>
-                </td>
-                <td><span class="area-text">{{ room.area }} m²</span></td>
-                <td><span class="price-text">{{ room.price | currency:'VND':'symbol':'1.0-0' }}</span></td>
-                <td>
-                  <span class="status-pill" [ngClass]="room.status.toLowerCase()">
-                    {{ getStatusLabel(room.status) }}
-                  </span>
-                </td>
-                <td class="text-right">
-                  <div class="action-group">
-                    <button class="link-btn" (click)="openEditModal(room)">Chỉnh sửa</button>
-                    <button class="link-btn danger" (click)="deleteRoom(room.id)">Xóa</button>
-                  </div>
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
+    <div class="table-card" *ngIf="!isLoading">
+      <table class="room-table">
+        <thead>
+          <tr>
+            <th>Phòng & Tòa nhà</th>
+            <th>Mô tả</th>
+            <th>Diện tích</th>
+            <th>Giá thuê</th>
+            <th>Trạng thái</th>
+            <th class="text-right">Thao tác</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let room of rooms; trackBy: trackByFn">
+            <td>
+              <div class="room-info">
+                <span class="room-name">{{ room.name }}</span>
+                <span class="building-name">{{ room.buildingName }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="description-truncate" [title]="room.description">
+                {{ room.description || 'Chưa có mô tả' }}
+              </div>
+            </td>
+            <td><span class="badge-light">{{ room.area }} m²</span></td>
+            <td><span class="price-text">{{ room.price | currency:'VND':'symbol':'1.0-0' }}</span></td>
+            <td>
+              <span class="status-pill" [ngClass]="room.status.toLowerCase()">
+                {{ getStatusLabel(room.status) }}
+              </span>
+            </td>
+            <td class="text-right">
+              <div class="action-group">
+                <button class="btn-link" (click)="openEditModal(room)">Sửa</button>
+                <button class="btn-link danger" (click)="deleteRoom(room.id)">Xóa</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-        @if (rooms.length === 0) {
-          <div class="empty-msg">Bạn chưa đăng tải phòng nào.</div>
-        }
-      </div>
-    }
+    <div *ngIf="isLoading" class="loading-state">Đang tải dữ liệu...</div>
   </main>
 
-  @if (isModalOpen) {
-    <div class="modal-overlay">
-      <div class="modal-card">
-        <div class="modal-header">
-          <h2>{{ isEditMode ? 'Cập nhật phòng' : 'Thêm phòng mới' }}</h2>
-          <button class="btn-close" (click)="isModalOpen = false">Đóng</button>
-        </div>
-        
-        <div class="modal-body">
-          <div class="form-row">
-            <div class="form-group">
-              <label>Tên phòng</label>
-              <input type="text" [(ngModel)]="roomForm.name" placeholder="Ví dụ: P.402">
-            </div>
-            <div class="form-group">
-              <label>Tòa nhà (ID)</label>
-              <input type="number" [(ngModel)]="roomForm.buildingId">
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label>Giá thuê (VNĐ)</label>
-              <input type="number" [(ngModel)]="roomForm.price">
-            </div>
-            <div class="form-group">
-              <label>Diện tích (m²)</label>
-              <input type="number" [(ngModel)]="roomForm.area">
-            </div>
-          </div>
-
+  <div class="modal-overlay" *ngIf="isModalOpen">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2>{{ isEditMode ? 'Cập nhật phòng' : 'Thêm phòng mới' }}</h2>
+        <button class="close-btn" (click)="isModalOpen = false">×</button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="form-grid">
           <div class="form-group">
-            <label>Trạng thái</label>
-            <select [(ngModel)]="roomForm.status">
-              <option value="AVAILABLE">Còn trống</option>
-              <option value="OCCUPIED">Đã thuê</option>
-              <option value="REPAIRING">Đang sửa chữa</option>
+            <label>Tòa nhà</label>
+            <select [(ngModel)]="roomForm.buildingId" name="buildingId">
+              <option *ngFor="let b of buildings" [value]="b.id">{{ b.name }}</option>
             </select>
           </div>
-
           <div class="form-group">
-            <label>Mô tả chi tiết</label>
-            <textarea [(ngModel)]="roomForm.description" rows="3"></textarea>
+            <label>Tên phòng</label>
+            <input type="text" [(ngModel)]="roomForm.name" name="name" placeholder="P.101">
           </div>
         </div>
 
-        <div class="modal-footer">
-          <button class="btn-secondary" (click)="isModalOpen = false">Hủy bỏ</button>
-          <button class="btn-save" (click)="saveRoom()">Lưu thông tin</button>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Giá thuê (VNĐ)</label>
+            <input type="number" [(ngModel)]="roomForm.price" name="price">
+          </div>
+          <div class="form-group">
+            <label>Diện tích (m²)</label>
+            <input type="number" [(ngModel)]="roomForm.area" name="area">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="label-with-btn">
+            <label>Tiện ích phòng</label>
+            <button type="button" class="btn-add-inline" (click)="addNewAmenity()" title="Thêm tiện ích mới">+</button>
+          </div>
+          <div class="amenity-selection-grid">
+            <div *ngFor="let a of allAmenities" 
+                 class="amenity-tag" 
+                 [class.active]="roomForm.amenityIds.includes(a.id!)"
+                 (click)="toggleAmenity(a.id!)">
+              {{ a.name }}
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Hình ảnh thực tế</label>
+          <div class="upload-zone">
+            <input type="file" (change)="onFileSelected($event)" multiple accept="image/*" id="fileIn" hidden>
+            <label for="fileIn" class="upload-trigger">Chọn ảnh từ thiết bị</label>
+            <div class="preview-row" *ngIf="imagePreviews.length > 0">
+              <div class="preview-item" *ngFor="let img of imagePreviews; let i = index">
+                <img [src]="img">
+                <button class="remove-img" (click)="removeImage(i, true)">×</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Mô tả chi tiết</label>
+          <textarea [(ngModel)]="roomForm.description" name="description" rows="3"></textarea>
         </div>
       </div>
+
+      <div class="modal-footer">
+        <button class="btn-ghost" (click)="isModalOpen = false">Hủy</button>
+        <button class="btn-save" (click)="saveRoom()">Lưu thông tin</button>
+      </div>
     </div>
-  }
+  </div>
 </div>

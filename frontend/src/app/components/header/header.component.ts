@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -11,20 +11,23 @@ import { AuthService } from '../../services/auth.service';
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent {
-  constructor(public authService: AuthService, private router: Router) {}
+  // authService phải là public để HTML truy cập được
+  constructor(public authService: AuthService) {}
 
-  // Lấy tên người dùng từ localStorage để hiển thị chào mừng
-  getUsername(): string | null {
-    return localStorage.getItem('username');
+  getFullName(): string {
+  const fullName = localStorage.getItem('fullName');
+  const username = localStorage.getItem('username');
+
+  // Kiểm tra nếu fullName tồn tại và không phải chuỗi "null" hoặc rỗng
+  if (fullName && fullName !== 'null' && fullName.trim() !== '') {
+    return fullName;
   }
+  
+  // Nếu không có fullName thì mới dùng username
+  return username || 'Người dùng';
+}
 
-  // Lấy vai trò để hiển thị menu phù hợp (Admin/Landlord/Tenant)
-  getRole(): string | null {
-    return localStorage.getItem('userRole');
-  }
-
-  onLogout(): void {
+  onLogout() {
     this.authService.logout();
-    this.router.navigate(['/login']);
   }
 }

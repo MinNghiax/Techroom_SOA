@@ -1,3 +1,10 @@
+export interface Amenity {
+  id?: number;
+  name: string;
+  icon?: string;
+  description?: string;
+}
+
 export interface RoomResponse {
   id: number;
   name: string;
@@ -5,9 +12,10 @@ export interface RoomResponse {
   area: number;
   status: 'AVAILABLE' | 'OCCUPIED' | 'REPAIRING';
   address: string;
+  buildingId: number;
   buildingName: string;
   imageUrls: string[];
-  amenities: string[];
+  amenities: Amenity[]; // Thay đổi từ string[] thành Amenity[]
   description: string;
 }
 
@@ -19,4 +27,5 @@ export interface RoomRequest {
   status: string;
   description: string;
   amenityIds: number[];
+  imageUrls: string[];
 }

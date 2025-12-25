@@ -48,7 +48,15 @@ public class AuthController {
                 .map(RefreshToken::getUser)
                 .map(user -> {
                     String token = jwtTokenProvider.generateToken(user.getUsername());
-                    return ResponseEntity.ok(new AuthResponse(token, requestRefreshToken, "Bearer", user.getUsername(), user.getRole().name()));
+                    // Sử dụng Builder để tránh lỗi sai thứ tự/số lượng tham số constructor
+                    AuthResponse response = AuthResponse.builder()
+                            .userId(user.getId())
+                            .accessToken(token)
+                            .refreshToken(requestRefreshToken)
+                            .username(user.getUsername())
+                            .role(user.getRole().name())
+                            .build();
+                    return ResponseEntity.ok(response);
                 })
                 .orElseThrow(() -> new RuntimeException("Refresh token is not in database!"));
     }

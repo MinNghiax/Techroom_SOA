@@ -54,6 +54,7 @@ public class AuthServiceImpl implements AuthService {
 
         // 6. Trả về Response chứa cả 2 loại token
         return AuthResponse.builder()
+                .userId(user.getId())
                 .accessToken(token)
                 .refreshToken(refreshToken.getToken())
                 .username(user.getUsername())

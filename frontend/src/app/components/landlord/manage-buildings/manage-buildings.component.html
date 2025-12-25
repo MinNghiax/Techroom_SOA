@@ -4,29 +4,62 @@
       <h1>Tòa nhà của tôi</h1>
       <p>Quản lý danh sách các khu nhà trọ đang sở hữu</p>
     </div>
-    <button class="btn-add">+ Thêm tòa nhà mới</button>
+    <button class="btn-add" (click)="openAddModal()">+ Thêm tòa nhà mới</button>
   </div>
 
   <div class="building-grid">
     <div class="b-card" *ngFor="let b of buildings">
-      <img [src]="b.image" alt="building">
       <div class="b-content">
         <h3>{{ b.name }}</h3>
-        <p class="addr">📍 {{ b.address }}</p>
-        <div class="b-stats">
-          <div class="stat">
-            <span>Tổng phòng</span>
-            <strong>{{ b.totalRooms }}</strong>
-          </div>
-          <div class="stat">
-            <span>Đang thuê</span>
-            <strong class="highlight">{{ b.activeRooms }}</strong>
-          </div>
-        </div>
+        <p class="addr">📍 {{ b.address }}, {{b.districtName}}, {{b.provinceName}}</p>
         <div class="b-actions">
-          <button class="btn-outline">Chi tiết</button>
-          <button class="btn-text">Chỉnh sửa</button>
+          <button class="btn-outline" (click)="openEditModal(b)">Chỉnh sửa</button>
+          <button class="btn-text danger" (click)="deleteBuilding(b.id)">Xóa tòa nhà</button>
+          <button class="btn-text">Chi tiết phòng</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" *ngIf="isModalOpen">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2>{{ isEditMode ? 'Chỉnh sửa tòa nhà' : 'Thêm tòa nhà mới' }}</h2>
+        <button (click)="isModalOpen = false">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Tên tòa nhà</label>
+          <input type="text" [(ngModel)]="buildingForm.name">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Tỉnh/Thành</label>
+            <select [(ngModel)]="buildingForm.provinceCode" (change)="onProvinceChange()">
+              <option [value]="null">-- Chọn Tỉnh --</option>
+              <option *ngFor="let p of provinces" [value]="p.code">{{p.name}}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Quận/Huyện</label>
+            <select [(ngModel)]="buildingForm.districtCode" [disabled]="!districts.length">
+              <option [value]="null">-- Chọn Huyện --</option>
+              <option *ngFor="let d of districts" [value]="d.code">{{d.name}}</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Địa chỉ chi tiết</label>
+          <input type="text" [(ngModel)]="buildingForm.address">
+        </div>
+        <div class="form-group">
+          <label>Mô tả</label>
+          <textarea [(ngModel)]="buildingForm.description" rows="3"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="isModalOpen = false">Hủy</button>
+        <button class="btn-save" (click)="saveBuilding()">Lưu lại</button>
       </div>
     </div>
   </div>

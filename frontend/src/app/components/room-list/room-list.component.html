@@ -13,7 +13,7 @@
   <div class="room-grid" *ngIf="!isLoading">
     <div class="room-card" *ngFor="let room of rooms" [routerLink]="['/rooms', room.id]">
       <div class="card-image">
-        <img [src]="room.imageUrls && room.imageUrls.length > 0 ? room.imageUrls[0] : 'assets/images/no-image.jpg'" alt="{{room.name}}">
+        <img [src]="room.imageUrls && room.imageUrls.length > 0 ? getImgUrl(room.imageUrls[0]) : 'assets/images/no-image.jpg'" alt="{{room.name}}">
         <div class="status-badge" [ngClass]="room.status.toLowerCase()">
           {{ room.status === 'AVAILABLE' ? 'Còn trống' : 'Đã thuê' }}
         </div>
@@ -30,7 +30,7 @@
         </div>
         
         <div class="amenities-preview" *ngIf="room.amenities && room.amenities.length > 0">
-          <span *ngFor="let am of room.amenities | slice:0:3" class="am-item">{{ am }}</span>
+          <span *ngFor="let am of room.amenities | slice:0:3" class="am-item">{{ am.name }}</span>
           <span *ngIf="room.amenities.length > 3" class="am-more">+{{ room.amenities.length - 3 }}</span>
         </div>
       </div>
