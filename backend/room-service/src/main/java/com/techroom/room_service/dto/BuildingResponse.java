@@ -1,5 +1,4 @@
 package com.techroom.room_service.dto;
-
 import lombok.Builder;
 import lombok.Data;
 
@@ -9,7 +8,9 @@ public class BuildingResponse {
     private Integer id;
     private String name;
     private String address;
-    private String provinceName;
-    private String districtName;
     private String description;
+    private Integer provinceCode;
+    private String provinceName;
+    private Integer districtCode;
+    private String districtName;
 }

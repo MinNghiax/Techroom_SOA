@@ -15,4 +15,6 @@ public interface RoomRepository extends JpaRepository<Room, Integer> {
             "AND (:maxPrice IS NULL OR r.price <= :maxPrice) " +
             "AND (:provinceCode IS NULL OR r.building.province.code = :provinceCode)")
     List<Room> searchRooms(Double minPrice, Double maxPrice, Integer provinceCode);
+
+    List<Room> findByBuilding_LandlordId(Integer landlordId);
 }

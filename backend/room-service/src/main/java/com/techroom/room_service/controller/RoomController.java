@@ -2,11 +2,15 @@ package com.techroom.room_service.controller;
 
 import com.techroom.room_service.dto.RoomRequest;
 import com.techroom.room_service.dto.RoomResponse;
+import com.techroom.room_service.entity.Amenity;
+import com.techroom.room_service.repository.AmenityRepository;
 import com.techroom.room_service.service.RoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -16,11 +20,9 @@ import java.util.List;
 public class RoomController {
 
     private final RoomService roomService;
+    private final AmenityRepository amenityRepository; // Inject trực tiếp để lấy danh sách nhanh
 
-    /**
-     * 1. API Tìm kiếm và Lọc phòng
-     * GET /api/rooms?minPrice=1000000&maxPrice=5000000&provinceCode=1
-     */
+    // --- CÁC PHƯƠNG THỨC CŨ (GIỮ NGUYÊN) ---
     @GetMapping
     public ResponseEntity<List<RoomResponse>> getRooms(
             @RequestParam(required = false) Double minPrice,
@@ -29,51 +31,46 @@ public class RoomController {
         return ResponseEntity.ok(roomService.searchRooms(minPrice, maxPrice, provinceCode));
     }
 
-    /**
-     * 2. API Lấy chi tiết một phòng
-     * GET /api/rooms/{id}
-     */
     @GetMapping("/{id}")
     public ResponseEntity<RoomResponse> getRoom(@PathVariable Integer id) {
         return ResponseEntity.ok(roomService.getRoomById(id));
     }
 
-    // Thêm endpoint này vào RoomController
     @GetMapping("/landlord")
-    public ResponseEntity<List<RoomResponse>> getRoomsByLandlord() {
-        // Trong thực tế, bạn sẽ lấy username từ SecurityContextHolder
-        // Ở đây tôi giả định Service sẽ xử lý việc lấy user hiện tại
-        return ResponseEntity.ok(roomService.getRoomsByLandlord());
+    public ResponseEntity<List<RoomResponse>> getRoomsByLandlord(@RequestHeader("X-User-Id") Integer landlordId) {
+        return ResponseEntity.ok(roomService.getRoomsByLandlord(landlordId));
     }
 
-    /**
-     * 3. API Tạo phòng mới (Cho Landlord)
-     * POST /api/rooms
-     */
-    @PostMapping
-    public ResponseEntity<RoomResponse> createRoom(@RequestBody RoomRequest request) {
-        RoomResponse createdRoom = roomService.createRoom(request);
-        return new ResponseEntity<>(createdRoom, HttpStatus.CREATED);
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<RoomResponse> createRoom(
+            @RequestPart("room") RoomRequest request,
+            @RequestPart(value = "images", required = false) List<MultipartFile> files) {
+        return new ResponseEntity<>(roomService.createRoom(request, files), HttpStatus.CREATED);
     }
 
-    /**
-     * 4. API Cập nhật thông tin phòng
-     * PUT /api/rooms/{id}
-     */
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<RoomResponse> updateRoom(
             @PathVariable Integer id,
-            @RequestBody RoomRequest request) {
-        return ResponseEntity.ok(roomService.updateRoom(id, request));
+            @RequestPart("room") RoomRequest request,
+            @RequestPart(value = "images", required = false) List<MultipartFile> files) {
+        return ResponseEntity.ok(roomService.updateRoom(id, request, files));
     }
 
-    /**
-     * 5. API Xóa phòng
-     * DELETE /api/rooms/{id}
-     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRoom(@PathVariable Integer id) {
         roomService.deleteRoom(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // --- CÁC PHƯƠNG THỨC MỚI CHO AMENITIES ---
+
+    @GetMapping("/amenities")
+    public ResponseEntity<List<Amenity>> getAllAmenities() {
+        return ResponseEntity.ok(amenityRepository.findAll());
+    }
+
+    @PostMapping("/amenities")
+    public ResponseEntity<Amenity> createAmenity(@RequestBody Amenity amenity) {
+        return ResponseEntity.ok(amenityRepository.save(amenity));
     }
 }

@@ -1,7 +1,7 @@
 package com.techroom.room_service.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+        import lombok.Data;
 
 @Entity
 @Table(name = "amenities")

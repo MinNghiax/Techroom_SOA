@@ -4,8 +4,8 @@ import com.techroom.room_service.dto.BuildingRequest;
 import com.techroom.room_service.dto.BuildingResponse;
 import com.techroom.room_service.entity.Building;
 import com.techroom.room_service.repository.BuildingRepository;
-import com.techroom.room_service.repository.ProvinceRepository;
 import com.techroom.room_service.repository.DistrictRepository;
+import com.techroom.room_service.repository.ProvinceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,26 +19,44 @@ public class BuildingService {
     private final ProvinceRepository provinceRepository;
     private final DistrictRepository districtRepository;
 
+    public List<BuildingResponse> getBuildingsByLandlord(Integer landlordId) {
+        return buildingRepository.findByLandlordId(landlordId).stream()
+                .map(this::mapToResponse).toList();
+    }
+
     public List<BuildingResponse> getAllBuildings() {
-        return buildingRepository.findAll().stream().map(this::mapToResponse).toList();
+        return buildingRepository.findAll().stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
     @Transactional
-    public BuildingResponse createBuilding(BuildingRequest request) {
-        Building building = new Building();
+    public BuildingResponse saveOrUpdate(Integer id, BuildingRequest request) {
+        Building building = (id == null) ? new Building() : buildingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy tòa nhà"));
+
         building.setLandlordId(request.getLandlordId());
         building.setName(request.getName());
         building.setAddress(request.getAddress());
         building.setDescription(request.getDescription());
 
-        // Lấy thông tin tỉnh/huyện từ DB gắn vào tòa nhà
         building.setProvince(provinceRepository.findById(request.getProvince().getCode())
-                .orElseThrow(() -> new RuntimeException("Tỉnh không tồn tại")));
+                .orElseThrow(() -> new RuntimeException("Tỉnh không hợp lệ")));
         building.setDistrict(districtRepository.findById(request.getDistrict().getCode())
-                .orElseThrow(() -> new RuntimeException("Huyện không tồn tại")));
+                .orElseThrow(() -> new RuntimeException("Huyện không hợp lệ")));
 
-        Building saved = buildingRepository.save(building);
-        return mapToResponse(saved);
+        return mapToResponse(buildingRepository.save(building));
+    }
+
+    // File: com.techroom.room_service.service.BuildingService
+    @Transactional
+    public void deleteBuilding(Integer id) {
+        // Kiểm tra tòa nhà có tồn tại không trước khi xóa
+        if (!buildingRepository.existsById(id)) {
+            throw new RuntimeException("Tòa nhà không tồn tại!");
+        }
+        buildingRepository.deleteById(id);
+        // Lưu ý: Nhờ cấu hình ON DELETE CASCADE trong DB, các phòng liên quan sẽ tự động bị xóa.
     }
 
     private BuildingResponse mapToResponse(Building building) {
@@ -46,9 +64,11 @@ public class BuildingService {
                 .id(building.getId())
                 .name(building.getName())
                 .address(building.getAddress())
-                .provinceName(building.getProvince().getName())
-                .districtName(building.getDistrict().getName())
                 .description(building.getDescription())
+                .provinceCode(building.getProvince().getCode())
+                .provinceName(building.getProvince().getName())
+                .districtCode(building.getDistrict().getCode())
+                .districtName(building.getDistrict().getName())
                 .build();
     }
 }

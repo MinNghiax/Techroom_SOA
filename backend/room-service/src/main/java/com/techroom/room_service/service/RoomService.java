@@ -2,16 +2,16 @@ package com.techroom.room_service.service;
 
 import com.techroom.room_service.dto.RoomRequest;
 import com.techroom.room_service.dto.RoomResponse;
-import com.techroom.room_service.entity.Room;
-import com.techroom.room_service.entity.RoomStatus;
-import com.techroom.room_service.repository.AmenityRepository;
-import com.techroom.room_service.repository.BuildingRepository;
-import com.techroom.room_service.repository.RoomRepository;
+import com.techroom.room_service.entity.*;
+import com.techroom.room_service.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
+import java.nio.file.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -19,77 +19,80 @@ public class RoomService {
     private final RoomRepository roomRepository;
     private final BuildingRepository buildingRepository;
     private final AmenityRepository amenityRepository;
+    private final RoomImageRepository roomImageRepository;
 
-    // 1. Tìm kiếm và Lọc phòng (Đã có)
+    private final String UPLOAD_DIR = "uploads/rooms/";
+
     public List<RoomResponse> searchRooms(Double min, Double max, Integer province) {
-        return roomRepository.searchRooms(min, max, province).stream()
-                .map(this::mapToResponse)
-                .toList();
+        return roomRepository.searchRooms(min, max, province).stream().map(this::mapToResponse).toList();
     }
 
-    // 2. Lấy chi tiết 1 phòng (Đã có)
     public RoomResponse getRoomById(Integer id) {
-        Room room = roomRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy phòng có ID: " + id));
+        Room room = roomRepository.findById(id).orElseThrow(() -> new RuntimeException("Phòng không tồn tại"));
         return mapToResponse(room);
     }
 
-    // Thêm phương thức này vào RoomService
-    public List<RoomResponse> getRoomsByLandlord() {
-        // Giả sử bạn lấy username từ SecurityContext hoặc truyền từ Controller vào
-        // Logic: Tìm các Building thuộc sở hữu của Landlord -> Tìm Rooms thuộc các Building đó
-        return roomRepository.findAll().stream() // Thay bằng query lọc theo Landlord thực tế
-                .map(this::mapToResponse)
-                .toList();
+    public List<RoomResponse> getRoomsByLandlord(Integer landlordId) {
+        return roomRepository.findByBuilding_LandlordId(landlordId).stream().map(this::mapToResponse).toList();
     }
 
-    // 3. Chức năng Landlord tạo phòng mới (MỚI)
     @Transactional
-    public RoomResponse createRoom(RoomRequest request) {
+    public RoomResponse createRoom(RoomRequest request, List<MultipartFile> files) {
         Room room = new Room();
-        // Tìm tòa nhà để gán cho phòng
+        return processRoomSave(room, request, files);
+    }
+
+    @Transactional
+    public RoomResponse updateRoom(Integer id, RoomRequest request, List<MultipartFile> files) {
+        Room room = roomRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy phòng để cập nhật"));
+        return processRoomSave(room, request, files);
+    }
+
+    private RoomResponse processRoomSave(Room room, RoomRequest request, List<MultipartFile> files) {
         room.setBuilding(buildingRepository.findById(request.getBuildingId())
                 .orElseThrow(() -> new RuntimeException("Tòa nhà không tồn tại")));
 
-        return saveOrUpdateRoom(room, request);
-    }
-
-    // 4. Chức năng Landlord cập nhật phòng (MỚI)
-    @Transactional
-    public RoomResponse updateRoom(Integer id, RoomRequest request) {
-        Room room = roomRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy phòng để cập nhật"));
-
-        return saveOrUpdateRoom(room, request);
-    }
-
-    // 5. Chức năng Xóa phòng (MỚI)
-    @Transactional
-    public void deleteRoom(Integer id) {
-        if (!roomRepository.existsById(id)) {
-            throw new RuntimeException("Không tìm thấy phòng để xóa");
-        }
-        roomRepository.deleteById(id);
-    }
-
-    // --- Hàm dùng chung để gán dữ liệu từ Request vào Entity ---
-    private RoomResponse saveOrUpdateRoom(Room room, RoomRequest request) {
         room.setName(request.getName());
         room.setPrice(request.getPrice());
         room.setArea(request.getArea());
         room.setDescription(request.getDescription());
         room.setStatus(RoomStatus.valueOf(request.getStatus().toUpperCase()));
 
-        // Xử lý gán tiện ích (Amenities)
+        // Lưu danh sách tiện ích từ mảng ID gửi lên
         if (request.getAmenityIds() != null) {
             room.setAmenities(amenityRepository.findAllById(request.getAmenityIds()));
+        } else {
+            room.getAmenities().clear(); // Nếu gửi null thì xóa trắng tiện ích
         }
 
         Room savedRoom = roomRepository.save(room);
+
+        if (files != null && !files.isEmpty()) {
+            saveRoomImages(savedRoom, files);
+        }
+
         return mapToResponse(savedRoom);
     }
 
-    // --- Hàm chuyển đổi sang DTO trả về cho UI ---
+    private void saveRoomImages(Room room, List<MultipartFile> files) {
+        files.forEach(file -> {
+            try {
+                String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+                Path path = Paths.get(UPLOAD_DIR + fileName);
+                Files.createDirectories(path.getParent());
+                Files.write(path, file.getBytes());
+
+                RoomImage img = new RoomImage();
+                img.setImageUrl("/api/rooms/images/" + fileName);
+                img.setRoom(room);
+                roomImageRepository.save(img);
+            } catch (IOException e) {
+                throw new RuntimeException("Lỗi lưu file ảnh", e);
+            }
+        });
+    }
+
     private RoomResponse mapToResponse(Room room) {
         return RoomResponse.builder()
                 .id(room.getId())
@@ -97,13 +100,17 @@ public class RoomService {
                 .price(room.getPrice())
                 .area(room.getArea())
                 .status(room.getStatus().name())
+                .buildingId(room.getBuilding() != null ? room.getBuilding().getId() : null)
                 .buildingName(room.getBuilding() != null ? room.getBuilding().getName() : "N/A")
                 .address(room.getBuilding() != null ? room.getBuilding().getAddress() : "N/A")
-                // Xử lý tránh lỗi Null nếu phòng chưa có ảnh hoặc tiện ích
+                .description(room.getDescription())
                 .imageUrls(room.getImages() != null ?
-                        room.getImages().stream().map(img -> img.getImageUrl()).toList() : List.of())
-                .amenities(room.getAmenities() != null ?
-                        room.getAmenities().stream().map(a -> a.getName()).toList() : List.of())
+                        room.getImages().stream().map(RoomImage::getImageUrl).toList() : List.of())
+                // SỬA: Trả về nguyên danh sách Entity Amenity (chứa cả ID và Name)
+                .amenities(room.getAmenities())
                 .build();
     }
+
+    @Transactional
+    public void deleteRoom(Integer id) { roomRepository.deleteById(id); }
 }

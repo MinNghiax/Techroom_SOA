@@ -1,5 +1,6 @@
 package com.techroom.room_service.dto;
 
+import com.techroom.room_service.entity.Amenity; // Đảm bảo import Entity Amenity
 import lombok.Builder;
 import lombok.Data;
 import java.util.List;
@@ -13,8 +14,9 @@ public class RoomResponse {
     private Double area;
     private String status;
     private String address;
+    private Integer buildingId;
     private String buildingName;
     private List<String> imageUrls;
-    private List<String> amenities;
+    private List<Amenity> amenities; // SỬA: Thay List<String> thành List<Amenity>
     private String description;
 }
