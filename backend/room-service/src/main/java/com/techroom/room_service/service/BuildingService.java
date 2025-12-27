@@ -3,13 +3,10 @@ package com.techroom.room_service.service;
 import com.techroom.room_service.dto.BuildingRequest;
 import com.techroom.room_service.dto.BuildingResponse;
 import com.techroom.room_service.entity.Building;
-import com.techroom.room_service.repository.BuildingRepository;
-import com.techroom.room_service.repository.DistrictRepository;
-import com.techroom.room_service.repository.ProvinceRepository;
+import com.techroom.room_service.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 
 @Service
@@ -25,17 +22,16 @@ public class BuildingService {
     }
 
     public List<BuildingResponse> getAllBuildings() {
-        return buildingRepository.findAll().stream()
-                .map(this::mapToResponse)
-                .toList();
+        return buildingRepository.findAll().stream().map(this::mapToResponse).toList();
     }
 
     @Transactional
-    public BuildingResponse saveOrUpdate(Integer id, BuildingRequest request) {
+    public BuildingResponse saveOrUpdate(Integer id, BuildingRequest request, Integer authenticatedLandlordId) {
         Building building = (id == null) ? new Building() : buildingRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy tòa nhà"));
 
-        building.setLandlordId(request.getLandlordId());
+        // Luôn gán landlordId từ Header để tránh lưu nhầm cho người khác
+        building.setLandlordId(authenticatedLandlordId);
         building.setName(request.getName());
         building.setAddress(request.getAddress());
         building.setDescription(request.getDescription());
@@ -48,15 +44,12 @@ public class BuildingService {
         return mapToResponse(buildingRepository.save(building));
     }
 
-    // File: com.techroom.room_service.service.BuildingService
     @Transactional
     public void deleteBuilding(Integer id) {
-        // Kiểm tra tòa nhà có tồn tại không trước khi xóa
         if (!buildingRepository.existsById(id)) {
             throw new RuntimeException("Tòa nhà không tồn tại!");
         }
         buildingRepository.deleteById(id);
-        // Lưu ý: Nhờ cấu hình ON DELETE CASCADE trong DB, các phòng liên quan sẽ tự động bị xóa.
     }
 
     private BuildingResponse mapToResponse(Building building) {

@@ -31,16 +31,27 @@ public class JwtAuthenticationGatewayFilter implements GlobalFilter, Ordered {
     private boolean isPublicEndpoint(ServerHttpRequest request) {
         String path = request.getURI().getPath();
         String method = request.getMethod() != null ? request.getMethod().name() : "";
+
         // GET các endpoint public
         if ("GET".equalsIgnoreCase(method)) {
-            if (path.startsWith("/api/locations")
+            // 1. ƯU TIÊN KIỂM TRA: Nếu là đường dẫn quản lý thì KHÔNG phải public
+            if (path.contains("/landlord")) {
+                return false;
+            }
+
+            // 2. CHẤP NHẬN: Các đường dẫn xem thông tin công khai
+            if (path.startsWith("/api/rooms/images")    // Cho phép hiện ảnh phòng
+                    || path.startsWith("/api/locations")
                     || path.startsWith("/api/rooms/amenities")
                     || path.startsWith("/api/reviews")
-                    || path.equals("/api/rooms") || path.matches("/api/rooms/\\d+")
-                    || path.equals("/api/buildings") || path.matches("/api/buildings/\\d+")) {
+                    || path.equals("/api/rooms")        // Danh sách phòng trang chủ
+                    || path.matches("/api/rooms/\\d+")
+                    || path.equals("/api/buildings")
+                    || path.matches("/api/buildings/\\d+")) {
                 return true;
             }
         }
+
         // Các path public khác (login, register)
         return PUBLIC_PATHS.stream().anyMatch(path::equals);
     }

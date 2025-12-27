@@ -39,10 +39,16 @@ export class ManageRoomsComponent implements OnInit {
   }
 
   loadBuildings() {
-    const landlordId = Number(localStorage.getItem('userId'));
-    if (landlordId) {
-      this.buildingService.getBuildingsByLandlord(landlordId).subscribe(data => this.buildings = data);
-    }
+    this.buildingService.getBuildingsByLandlord().subscribe({
+      next: (data) => {
+        this.buildings = data;
+        // Tự động chọn tòa nhà đầu tiên nếu đang thêm mới
+        if (!this.isEditMode && this.buildings.length > 0) {
+          this.roomForm.buildingId = this.buildings[0].id;
+        }
+      },
+      error: (err) => console.error('Lỗi tải danh sách tòa nhà:', err)
+    });
   }
 
   loadRooms() {

@@ -45,14 +45,10 @@ export class ManageBuildingsComponent implements OnInit {
    * Tải danh sách tòa nhà theo chủ trọ hiện tại
    */
   loadBuildings() {
-    const userIdStr = localStorage.getItem('userId');
-    if (userIdStr && userIdStr !== 'undefined' && userIdStr !== 'null') {
-      const landlordId = Number(userIdStr);
-      this.buildingService.getBuildingsByLandlord(landlordId).subscribe({
-        next: (data) => this.buildings = data,
-        error: (err) => console.error('Lỗi tải danh sách tòa nhà:', err)
-      });
-    }
+    this.buildingService.getBuildingsByLandlord().subscribe({
+      next: (data) => this.buildings = data,
+      error: (err) => console.error('Lỗi tải danh sách tòa nhà:', err)
+    });
   }
 
   /**
