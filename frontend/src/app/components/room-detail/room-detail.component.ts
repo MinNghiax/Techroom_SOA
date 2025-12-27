@@ -21,6 +21,7 @@ import { ReviewComponent } from '../review/review.component';
 })
 export class RoomDetailComponent implements OnInit {
   room?: RoomResponse;
+  showBookingForm = false;
   reviews: any[] = [];
   isLoading = true;
   readonly baseUrl = 'http://localhost:8080';
@@ -56,5 +57,14 @@ export class RoomDetailComponent implements OnInit {
   getImgUrl(url: string): string {
     if (!url) return 'assets/images/no-image.jpg';
     return url.startsWith('http') ? url : `${this.baseUrl}${url}`;
+  }
+  toggleBookingForm() {
+    this.showBookingForm = !this.showBookingForm;
+  }
+
+  // Hàm này chạy khi form bên trong báo thành công
+  onBookingSuccess() {
+    this.showBookingForm = false;
+    // Bạn có thể thêm thông báo thành công hoặc redirect ở đây
   }
 }

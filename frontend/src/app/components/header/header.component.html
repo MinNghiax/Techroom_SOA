@@ -11,9 +11,11 @@
       <li><a routerLink="/rooms" routerLinkActive="active">Tìm phòng</a></li>
 
       <li *ngIf="authService.getRole() === 'TENANT'">
-        <a routerLink="/my-bookings" routerLinkActive="active">Phòng đã đặt</a>
+        <a routerLink="/tenant/my-bookings" routerLinkActive="active">Hợp đồng đã thuê</a>
       </li>
-
+      <li *ngIf="authService.getRole() === 'LANDLORD'">
+    <a routerLink="/landlord/contract-management" routerLinkActive="active">Duyệt đặt phòng</a>
+    </li>
       <li *ngIf="authService.getRole() === 'LANDLORD'">
         <a routerLink="/landlord/manage-rooms" routerLinkActive="active">Quản lý phòng</a>
       </li>

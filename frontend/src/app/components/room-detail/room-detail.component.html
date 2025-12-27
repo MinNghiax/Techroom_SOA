@@ -51,7 +51,24 @@
         <div class="price-box">
           <span class="price">{{ room.price | currency:'VND':'symbol':'1.0-0' }}</span>/tháng
         </div>
-        <app-booking-form [roomId]="room.id"></app-booking-form>
+        
+        <button class="btn-open-booking" (click)="toggleBookingForm()" *ngIf="room.status === 'AVAILABLE'">
+          Thuê phòng ngay
+        </button>
+        <button class="btn-disabled" *ngIf="room.status !== 'AVAILABLE'" disabled>
+          Phòng đã được thuê
+        </button>
+      </div>
+    </div>
+
+    <div class="booking-modal-overlay" *ngIf="showBookingForm" (click)="toggleBookingForm()">
+      <div class="booking-modal-content" (click)="$event.stopPropagation()">
+        <button class="modal-close-x" (click)="toggleBookingForm()">&times;</button>
+        
+        <app-booking-form 
+          [roomInfo]="room" 
+          (bookingSuccess)="onBookingSuccess()">
+        </app-booking-form>
       </div>
     </div>
   </div>

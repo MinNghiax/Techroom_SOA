@@ -13,6 +13,8 @@ import { MyBookingsComponent } from './components/tenant/my-bookings/my-bookings
 import { ManageRoomsComponent } from './components/landlord/manage-rooms/manage-rooms.component';
 import { ManageBuildingsComponent } from './components/landlord/manage-buildings/manage-buildings.component';
 import { AdminUsersComponent } from './components/admin/admin-users/admin-users.component';
+import { ContractManagementComponent } from './components/landlord/contract-management/contract-management.component';
+
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -24,7 +26,7 @@ export const routes: Routes = [
     path: 'tenant', 
     canActivate: [tenantGuard],
     children: [
-      { path: 'bookings', component: MyBookingsComponent }
+      { path: 'my-bookings', component: MyBookingsComponent }
     ]
   },
   { 
@@ -32,7 +34,8 @@ export const routes: Routes = [
     canActivate: [landlordGuard],
     children: [
       { path: 'manage-rooms', component: ManageRoomsComponent },
-      { path: 'manage-buildings', component: ManageBuildingsComponent }
+      { path: 'manage-buildings', component: ManageBuildingsComponent },
+      { path: 'contract-management', component: ContractManagementComponent }
     ]
   },
   { 
@@ -46,5 +49,7 @@ export const routes: Routes = [
 
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
-  { path: '**', redirectTo: '' }
+  { path: '**', redirectTo: '' },
+
+  
 ];

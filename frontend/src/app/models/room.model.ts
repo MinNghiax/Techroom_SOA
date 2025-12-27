@@ -17,6 +17,7 @@ export interface RoomResponse {
   imageUrls: string[];
   amenities: Amenity[]; // Thay đổi từ string[] thành Amenity[]
   description: string;
+  landlordId: number; 
 }
 
 export interface RoomRequest {

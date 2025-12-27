@@ -1,61 +1,59 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { ApiResponse, BookingDTO, Contract } from '../models/booking.model';
 import { environment } from '../../environments/environment';
-import { BookingRequest } from '../models/booking.model';
+import { RejectDTO } from '../models/booking.model';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class BookingService {
-  // Đi qua Gateway Port 8080 để đến Booking Service
-  private apiUrl = `${environment.apiBaseUrl}/bookings`;
+  private readonly apiUrl = `${environment.apiBaseUrl}/bookings`;
 
   constructor(private http: HttpClient) {}
 
-  // Tạo yêu cầu đặt phòng (Tenant)
-  createBooking(dto: BookingRequest): Observable<any> {
-    // Không gửi tenantId, chỉ gửi các trường BookingRequest
-    const {
-      roomId,
-      landlordId,
-      fullName,
-      cccd,
-      phone,
-      address,
-      startDate,
-      endDate,
-      deposit,
-      monthlyRent,
-      notes
-    } = dto;
-    return this.http.post<any>(this.apiUrl, {
-      roomId,
-      landlordId,
-      fullName,
-      cccd,
-      phone,
-      address,
-      startDate,
-      endDate,
-      deposit,
-      monthlyRent,
-      notes
+  private getHeaders(): HttpHeaders {
+    let userId = localStorage.getItem('userId');
+    const role = localStorage.getItem('role');
+
+    // Nếu userId không tồn tại (do chưa login hoặc bị xóa), 
+    // bạn nên để là '1' (ID của một user test) thay vì '0' để tránh lỗi logic database
+    if (!userId || userId === 'undefined') {
+        console.warn('Cảnh báo: Không tìm thấy userId trong localStorage, đang dùng ID tạm là 1');
+        userId = '1'; 
+    }
+
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      'X-User-Id': userId, 
+      'X-Role': role || 'TENANT'
     });
+}
+
+  // 1. Tạo mới booking
+  createBooking(dto: BookingDTO): Observable<ApiResponse<Contract>> {
+    return this.http.post<ApiResponse<Contract>>(this.apiUrl, dto, { headers: this.getHeaders() });
   }
 
-  // Xem danh sách hợp đồng cá nhân (Tenant)
-  getTenantContracts(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/my-contracts`);
+  // 2. Lấy danh sách cần duyệt cho CHỦ TRỌ (Backend thường là /landlord hoặc /all)
+  getLandlordBookings(): Observable<ApiResponse<Contract[]>> {
+    return this.http.get<ApiResponse<Contract[]>>(`${this.apiUrl}`, { headers: this.getHeaders() });
   }
 
-  // Lấy tất cả booking (Admin/Staff)
-  getAllBookings(): Observable<any> {
-    return this.http.get<any>(this.apiUrl);
+  // 3. Lấy hợp đồng của người dùng hiện tại (Tenant)
+  getMyContracts(): Observable<ApiResponse<Contract[]>> {
+    return this.http.get<ApiResponse<Contract[]>>(`${this.apiUrl}/my-contracts`, { headers: this.getHeaders() });
   }
 
-  // Duyệt hợp đồng (Landlord)
-  approveBooking(id: number): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/${id}/approve`, {});
+  /// 4. Duyệt hợp đồng
+  approve(id: number): Observable<ApiResponse<any>> {
+    // Backend: @PutMapping("/{id}/approve")
+    return this.http.put<ApiResponse<any>>(`${this.apiUrl}/${id}/approve`, {}, { headers: this.getHeaders() });
+  }
+
+  // 5. Từ chối hợp đồng
+  reject(id: number, reason: string): Observable<ApiResponse<any>> {
+    // Backend mong đợi RejectDTO: @RequestBody RejectDTO dto
+    const body: RejectDTO = { reason: reason }; 
+    return this.http.put<ApiResponse<any>>(`${this.apiUrl}/${id}/reject`, body, { headers: this.getHeaders() });
   }
 }

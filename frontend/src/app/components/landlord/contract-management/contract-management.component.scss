@@ -1,0 +1,1122 @@
+/* Container chính */
+.contract-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+/* Header Section */
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 3px solid #e0e0e0;
+  position: relative;
+}
+
+.header-section::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 120px;
+  height: 3px;
+  background: linear-gradient(90deg, #6c63ff, #a855f7);
+  border-radius: 2px;
+}
+
+.header-section h2 {
+  color: #2c3e50;
+  font-weight: 700;
+  font-size: 2rem;
+  margin: 0;
+}
+
+/* Nút tạo hợp đồng mới */
+.btn-create {
+  background: linear-gradient(135deg, #6c63ff 0%, #a855f7 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3);
+}
+
+.btn-create:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(108, 99, 255, 0.4);
+}
+
+.btn-create:active {
+  transform: translateY(0);
+}
+
+/* Loading text */
+.loading-text {
+  text-align: center;
+  padding: 4rem 0;
+  color: #7f8c8d;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.loading-text::before {
+  content: '⏳';
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Table styling */
+.contract-table {
+  width: 100%;
+  background: white;
+  border-collapse: collapse;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.contract-table thead {
+  background: linear-gradient(135deg, #7c6fd6 0%, #a78bfa 100%);
+}
+
+.contract-table thead th {
+  color: white;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+  letter-spacing: 0.5px;
+  padding: 1.2rem 1.5rem;
+  text-align: left;
+  border: none;
+  white-space: nowrap;
+}
+
+/* Căn giữa các cột cụ thể */
+.contract-table thead th:nth-child(3),
+.contract-table thead th:nth-child(4),
+.contract-table thead th:nth-child(5) {
+  text-align: center;
+}
+
+.contract-table thead th:nth-child(6) {
+  text-align: center;
+}
+
+.contract-table tbody tr {
+  transition: background-color 0.2s ease;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.contract-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.contract-table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.contract-table tbody td {
+  padding: 1.25rem 1.5rem;
+  color: #495057;
+  font-size: 0.95rem;
+  vertical-align: middle;
+}
+
+/* Căn giữa nội dung */
+.contract-table tbody td:nth-child(3),
+.contract-table tbody td:nth-child(4),
+.contract-table tbody td:nth-child(5) {
+  text-align: center;
+}
+
+.contract-table tbody td:first-child {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+/* Badge styling */
+.badge {
+  padding: 0.5rem 1.25rem;
+  border-radius: 25px;
+  font-weight: 600;
+  font-size: 0.813rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.badge-pending {
+  background: #f59e0b;
+  color: white;
+}
+
+.badge-active {
+  background: #10b981;
+  color: white;
+}
+
+.badge-rejected {
+  background: #ef4444;
+  color: white;
+}
+
+/* Action buttons container */
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Button base styles */
+.action-buttons button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.action-buttons button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.action-buttons button:active {
+  transform: translateY(0);
+}
+
+/* Button variants */
+.btn-approve {
+  background: #10b981;
+  color: white;
+}
+
+.btn-approve:hover {
+  background: #059669;
+}
+
+.btn-reject {
+  background: #ef4444;
+  color: white;
+}
+
+.btn-reject:hover {
+  background: #dc2626;
+}
+
+.btn-detail {
+  background: #6c63ff;
+  color: white;
+}
+
+.btn-detail:hover {
+  background: #5a52d5;
+}
+
+.btn-danger {
+  background: #dc2626;
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #b91c1c;
+}
+
+/* Empty state */
+.contract-table tbody tr td[colspan] {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  color: #9ca3af;
+  font-size: 1rem;
+  font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .contract-table thead th,
+  .contract-table tbody td {
+    padding: 1rem;
+    font-size: 0.875rem;
+  }
+
+  .action-buttons button {
+    padding: 0.45rem 0.85rem;
+    font-size: 0.813rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .header-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .btn-create {
+    width: 100%;
+    text-align: center;
+  }
+
+  .contract-table {
+    font-size: 0.85rem;
+  }
+
+  .contract-table thead th,
+  .contract-table tbody td {
+    padding: 0.875rem 0.75rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .contract-container {
+    padding: 1rem;
+  }
+
+  .header-section h2 {
+    font-size: 1.5rem;
+  }
+
+  .header-section::after {
+    width: 80px;
+  }
+
+  /* Stack table cho mobile */
+  .contract-table thead {
+    display: none;
+  }
+
+  .contract-table tbody tr {
+    display: block;
+    margin-bottom: 1rem;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .contract-table tbody td {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #f3f4f6;
+    text-align: right;
+  }
+
+  .contract-table tbody td:last-child {
+    border-bottom: none;
+  }
+
+  .contract-table tbody td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #6b7280;
+    text-align: left;
+  }
+
+  .contract-table tbody td:first-child {
+    background: linear-gradient(135deg, #7c6fd6 0%, #a78bfa 100%);
+    color: white;
+    font-weight: 700;
+  }
+
+  .contract-table tbody td:first-child::before {
+    color: white;
+  }
+
+  .action-buttons {
+    justify-content: flex-end;
+    width: 100%;
+  }
+
+  .badge {
+    margin-left: auto;
+  }
+}
+
+@media (max-width: 576px) {
+  .contract-container {
+    padding: 0.75rem;
+  }
+
+  .header-section h2 {
+    font-size: 1.25rem;
+  }
+
+  .btn-create {
+    font-size: 0.875rem;
+    padding: 0.65rem 1.25rem;
+  }
+
+  .action-buttons button {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.75rem;
+  }
+
+  .badge {
+    font-size: 0.75rem;
+    padding: 0.4rem 1rem;
+  }
+}
+
+/* Scrollbar styling */
+.contract-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.contract-container::-webkit-scrollbar-track {
+  background: #f1f3f4;
+}
+
+.contract-container::-webkit-scrollbar-thumb {
+  background: #7c6fd6;
+  border-radius: 4px;
+}
+
+.contract-container::-webkit-scrollbar-thumb:hover {
+  background: #6c5fc6;
+}
+/* Container chính */
+.contract-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+/* Header Section */
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 3px solid #e0e0e0;
+  position: relative;
+}
+
+.header-section::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 120px;
+  height: 3px;
+  background: linear-gradient(90deg, #6c63ff, #a855f7);
+  border-radius: 2px;
+}
+
+.header-section h2 {
+  color: #2c3e50;
+  font-weight: 700;
+  font-size: 2rem;
+  margin: 0;
+}
+
+/* Nút tạo hợp đồng mới */
+.btn-create {
+  background: linear-gradient(135deg, #6c63ff 0%, #a855f7 100%);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3);
+}
+
+.btn-create:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(108, 99, 255, 0.4);
+}
+
+.btn-create:active {
+  transform: translateY(0);
+}
+
+/* Loading text */
+.loading-text {
+  text-align: center;
+  padding: 4rem 0;
+  color: #7f8c8d;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.loading-text::before {
+  content: '⏳';
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Table styling */
+.contract-table {
+  width: 100%;
+  background: white;
+  border-collapse: collapse;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.contract-table thead {
+  background: linear-gradient(135deg, #7c6fd6 0%, #a78bfa 100%);
+}
+
+.contract-table thead th {
+  color: white;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+  letter-spacing: 0.5px;
+  padding: 1.2rem 1.5rem;
+  text-align: left;
+  border: none;
+  white-space: nowrap;
+}
+
+/* Căn giữa các cột cụ thể */
+.contract-table thead th:nth-child(3),
+.contract-table thead th:nth-child(4),
+.contract-table thead th:nth-child(5) {
+  text-align: center;
+}
+
+.contract-table thead th:nth-child(6) {
+  text-align: center;
+}
+
+.contract-table tbody tr {
+  transition: background-color 0.2s ease;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.contract-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.contract-table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.contract-table tbody td {
+  padding: 1.25rem 1.5rem;
+  color: #495057;
+  font-size: 0.95rem;
+  vertical-align: middle;
+}
+
+/* Căn giữa nội dung */
+.contract-table tbody td:nth-child(3),
+.contract-table tbody td:nth-child(4),
+.contract-table tbody td:nth-child(5) {
+  text-align: center;
+}
+
+.contract-table tbody td:first-child {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+/* Badge styling */
+.badge {
+  padding: 0.5rem 1.25rem;
+  border-radius: 25px;
+  font-weight: 600;
+  font-size: 0.813rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.badge-pending {
+  background: #f59e0b;
+  color: white;
+}
+
+.badge-active {
+  background: #10b981;
+  color: white;
+}
+
+.badge-rejected {
+  background: #ef4444;
+  color: white;
+}
+
+/* Action buttons container */
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Button base styles */
+.action-buttons button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.action-buttons button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.action-buttons button:active {
+  transform: translateY(0);
+}
+
+/* Button variants */
+.btn-approve {
+  background: #10b981;
+  color: white;
+}
+
+.btn-approve:hover {
+  background: #059669;
+}
+
+.btn-approve::before {
+  content: '✓ ';
+  font-weight: bold;
+}
+
+.btn-reject {
+  background: #ef4444;
+  color: white;
+}
+
+.btn-reject:hover {
+  background: #dc2626;
+}
+
+.btn-reject::before {
+  content: '✕ ';
+  font-weight: bold;
+}
+
+.btn-detail {
+  background: #6c63ff;
+  color: white;
+  position: relative;
+}
+
+.btn-detail:hover {
+  background: #5a52d5;
+}
+
+.btn-detail::before {
+  content: '📄 ';
+  margin-right: 0.25rem;
+}
+
+.btn-danger {
+  background: #dc2626;
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #b91c1c;
+}
+
+.btn-danger::before {
+  content: '⚠ ';
+  margin-right: 0.25rem;
+}
+
+/* Empty state */
+.contract-table tbody tr td[colspan] {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  color: #9ca3af;
+  font-size: 1rem;
+  font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .contract-table thead th,
+  .contract-table tbody td {
+    padding: 1rem;
+    font-size: 0.875rem;
+  }
+
+  .action-buttons button {
+    padding: 0.45rem 0.85rem;
+    font-size: 0.813rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .header-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .btn-create {
+    width: 100%;
+    text-align: center;
+  }
+
+  .contract-table {
+    font-size: 0.85rem;
+  }
+
+  .contract-table thead th,
+  .contract-table tbody td {
+    padding: 0.875rem 0.75rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .contract-container {
+    padding: 1rem;
+  }
+
+  .header-section h2 {
+    font-size: 1.5rem;
+  }
+
+  .header-section::after {
+    width: 80px;
+  }
+
+  /* Stack table cho mobile */
+  .contract-table thead {
+    display: none;
+  }
+
+  .contract-table tbody tr {
+    display: block;
+    margin-bottom: 1rem;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .contract-table tbody td {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #f3f4f6;
+    text-align: right;
+  }
+
+  .contract-table tbody td:last-child {
+    border-bottom: none;
+  }
+
+  .contract-table tbody td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #6b7280;
+    text-align: left;
+  }
+
+  .contract-table tbody td:first-child {
+    background: linear-gradient(135deg, #7c6fd6 0%, #a78bfa 100%);
+    color: white;
+    font-weight: 700;
+  }
+
+  .contract-table tbody td:first-child::before {
+    color: white;
+  }
+
+  .action-buttons {
+    justify-content: flex-end;
+    width: 100%;
+  }
+
+  .badge {
+    margin-left: auto;
+  }
+}
+
+@media (max-width: 576px) {
+  .contract-container {
+    padding: 0.75rem;
+  }
+
+  .header-section h2 {
+    font-size: 1.25rem;
+  }
+
+  .btn-create {
+    font-size: 0.875rem;
+    padding: 0.65rem 1.25rem;
+  }
+
+  .action-buttons button {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.75rem;
+  }
+
+  .badge {
+    font-size: 0.75rem;
+    padding: 0.4rem 1rem;
+  }
+}
+
+/* Scrollbar styling */
+.contract-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.contract-container::-webkit-scrollbar-track {
+  background: #f1f3f4;
+}
+
+.contract-container::-webkit-scrollbar-thumb {
+  background: #7c6fd6;
+  border-radius: 4px;
+}
+
+.contract-container::-webkit-scrollbar-thumb:hover {
+  background: #6c5fc6;
+}
+
+/* Modal Detail Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 1rem;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Modal Content */
+.modal-content.detail-card {
+  background: white;
+  border-radius: 16px;
+  max-width: 900px;
+  width: 100%;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s ease;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Modal Header */
+.modal-header {
+  padding: 2rem;
+  background: linear-gradient(135deg, #6c63ff 0%, #a855f7 100%);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.close-x {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 1.75rem;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+}
+
+.close-x:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: rotate(90deg);
+}
+
+/* Modal Body */
+.modal-body {
+  padding: 2rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+  background: #f1f3f4;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+  background: #7c6fd6;
+  border-radius: 4px;
+}
+
+/* Info Grid */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.info-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.info-group label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-group p {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #2c3e50;
+  margin: 0;
+  padding: 0.75rem 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 3px solid #e5e7eb;
+}
+
+.info-group p.text-primary {
+  color: #6c63ff;
+  font-weight: 700;
+  background: #f0f4ff;
+  border-left-color: #6c63ff;
+}
+
+.info-group p.text-danger {
+  color: #ef4444;
+  font-weight: 700;
+  background: #fef2f2;
+  border-left-color: #ef4444;
+}
+
+/* Info Full Width */
+.info-full {
+  margin-bottom: 1.5rem;
+}
+
+.info-full label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.75rem;
+}
+
+.notes-box {
+  padding: 1.25rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 3px solid #6c63ff;
+  color: #4b5563;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  min-height: 80px;
+  white-space: pre-wrap;
+}
+
+.info-full p.text-danger {
+  padding: 1rem;
+  background: #fef2f2;
+  border-radius: 8px;
+  border-left: 3px solid #ef4444;
+  color: #dc2626;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* Modal Footer */
+.modal-footer {
+  padding: 1.5rem 2rem;
+  background: #f8f9fa;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.modal-footer .btn-secondary {
+  padding: 0.75rem 2rem;
+  border: 2px solid #d1d5db;
+  background: white;
+  color: #374151;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.modal-footer .btn-secondary:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+/* Responsive Modal */
+@media (max-width: 768px) {
+  .modal-content.detail-card {
+    max-width: 100%;
+    max-height: 95vh;
+    border-radius: 12px;
+  }
+
+  .modal-header {
+    padding: 1.5rem;
+  }
+
+  .modal-header h3 {
+    font-size: 1.25rem;
+  }
+
+  .close-x {
+    width: 36px;
+    height: 36px;
+    font-size: 1.5rem;
+  }
+
+  .modal-body {
+    padding: 1.5rem;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .modal-footer {
+    padding: 1.25rem 1.5rem;
+  }
+
+  .modal-footer .btn-secondary {
+    width: 100%;
+  }
+}
+
+@media (max-width: 576px) {
+  .modal-overlay {
+    padding: 0.5rem;
+  }
+
+  .modal-header {
+    padding: 1.25rem;
+  }
+
+  .modal-header h3 {
+    font-size: 1.125rem;
+  }
+
+  .modal-body {
+    padding: 1.25rem;
+  }
+
+  .info-group p {
+    font-size: 0.95rem;
+    padding: 0.65rem 0.85rem;
+  }
+
+  .notes-box {
+    padding: 1rem;
+    font-size: 0.9rem;
+  }
+
+  .modal-footer {
+    padding: 1rem 1.25rem;
+  }
+
+  .modal-footer .btn-secondary {
+    padding: 0.65rem 1.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Modal Accessibility */
+.modal-overlay:focus {
+  outline: none;
+}
+
+.close-x:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 2px;
+}

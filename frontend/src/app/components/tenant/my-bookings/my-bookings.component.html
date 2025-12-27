@@ -1,23 +1,46 @@
-<div class="container">
-  <div class="page-header">
-    <h1>Phòng đã đặt của bạn</h1>
-    <p>Theo dõi trạng thái và thời hạn hợp đồng các phòng trọ đã đặt.</p>
+<div class="container mt-4">
+  <h2>Hợp đồng của tôi</h2>
+
+  <div *ngIf="isLoading" class="text-center">
+    <p>Đang tải dữ liệu...</p>
   </div>
 
-  <div class="booking-list">
-    <div class="booking-card" *ngFor="let b of bookings">
-      <div class="booking-info">
-        <h3>{{ b.roomName }}</h3>
-        <p class="building">🏢 {{ b.building }}</p>
-        <div class="dates">
-          <span>Từ: <strong>{{ b.startDate | date:'dd/MM/yyyy' }}</strong></span>
-          <span>Đến: <strong>{{ b.endDate | date:'dd/MM/yyyy' }}</strong></span>
-        </div>
-      </div>
-      <div class="booking-meta">
-        <span class="price">{{ b.price | currency:'VND' }}</span>
-        <span class="status-badge" [ngClass]="b.status.toLowerCase()">{{ b.status }}</span>
-      </div>
-    </div>
+  <div *ngIf="!isLoading && bookings.length === 0" class="alert alert-info">
+    Bạn chưa có yêu cầu đặt phòng nào.
+  </div>
+
+  <div class="table-responsive" *ngIf="!isLoading && bookings.length > 0">
+    <table class="table table-hover shadow-sm">
+      <thead class="thead-dark">
+        <tr>
+          <th>Mã HĐ</th>
+          <th>Người đặt</th>
+          <th>Ngày bắt đầu</th>
+          <th>Tiền thuê</th>
+          <th>Trạng thái</th>
+          <th>Ghi chú</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of bookings">
+          <td><strong>{{ item.contractCode }}</strong></td>
+          <td>{{ item.fullName }}</td>
+          <td>{{ item.startDate | date:'dd/MM/yyyy' }}</td>
+          <td>{{ item.monthlyRent | number }} VNĐ</td>
+          <td>
+            <span class="badge" [ngClass]="getStatusClass(item.status)">
+              {{ item.status === 'APPROVED' ? 'Đã duyệt' : 
+                 item.status === 'PENDING' ? 'Chờ duyệt' : 'Từ chối' }}
+            </span>
+          </td>
+          <td>
+            <small class="text-muted">{{ item.notes || 'Không có' }}</small>
+            <div *ngIf="item.rejectionReason" class="text-danger mt-1">
+              Lý do từ chối: {{ item.rejectionReason }}
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </div>

@@ -103,10 +103,14 @@ public class RoomService {
                 .buildingId(room.getBuilding() != null ? room.getBuilding().getId() : null)
                 .buildingName(room.getBuilding() != null ? room.getBuilding().getName() : "N/A")
                 .address(room.getBuilding() != null ? room.getBuilding().getAddress() : "N/A")
+
+                // --- THÊM DÒNG NÀY ĐỂ FIX LỖI 500 VÀ TRUYỀN DỮ LIỆU ---
+                .landlordId(room.getBuilding() != null ? room.getBuilding().getLandlordId() : null)
+                // -----------------------------------------------------
+
                 .description(room.getDescription())
                 .imageUrls(room.getImages() != null ?
                         room.getImages().stream().map(RoomImage::getImageUrl).toList() : List.of())
-                // SỬA: Trả về nguyên danh sách Entity Amenity (chứa cả ID và Name)
                 .amenities(room.getAmenities())
                 .build();
     }

@@ -24,16 +24,20 @@ public class BookingController {
     // TENANT tạo booking
     @PostMapping
     public ApiResponse<?> create(
-            @RequestHeader("X-User-Id") Integer tenantId,
-            @RequestHeader("X-Role") String role,
+            @RequestHeader(value = "X-User-Id", required = false) Integer tenantId,
+            @RequestHeader(value = "X-Role", required = false) String role,
             @RequestBody BookingDTO dto
     ) {
-        if (!"TENANT".equals(role)) {
-            throw new RuntimeException("Only tenant can book");
+        // Kiểm tra thủ công để debug dễ hơn
+        if (tenantId == null || role == null) {
+            return new ApiResponse<>(false, "Thiếu thông tin xác thực (X-User-Id hoặc X-Role)", null);
         }
-        return ApiResponse.success(
-                bookingService.createBooking(dto, tenantId)
-        );
+
+        if (!"TENANT".equals(role)) {
+            return new ApiResponse<>(false, "Chỉ người thuê mới có thể đặt phòng", null);
+        }
+
+        return ApiResponse.success(bookingService.createBooking(dto, tenantId));
     }
 
     // TENANT xem hợp đồng
@@ -53,7 +57,7 @@ public class BookingController {
             @RequestHeader("X-User-Id") Integer landlordId,
             @RequestHeader("X-Role") String role
     ) {
-        if (!"LANDLORD".equals(role)) {
+        if (!"LANDLORD".equalsIgnoreCase(role)) {
             throw new RuntimeException("Only landlord can approve");
         }
         return ApiResponse.success(

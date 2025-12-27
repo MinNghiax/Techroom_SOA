@@ -19,4 +19,6 @@ public class RoomResponse {
     private List<String> imageUrls;
     private List<Amenity> amenities; // SỬA: Thay List<String> thành List<Amenity>
     private String description;
+    // THÊM TRƯỜNG NÀY
+    private Integer landlordId;
 }
