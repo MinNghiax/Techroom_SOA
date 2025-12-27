@@ -15,7 +15,33 @@ export class BookingService {
 
   // Tạo yêu cầu đặt phòng (Tenant)
   createBooking(dto: BookingRequest): Observable<any> {
-    return this.http.post<any>(this.apiUrl, dto);
+    // Không gửi tenantId, chỉ gửi các trường BookingRequest
+    const {
+      roomId,
+      landlordId,
+      fullName,
+      cccd,
+      phone,
+      address,
+      startDate,
+      endDate,
+      deposit,
+      monthlyRent,
+      notes
+    } = dto;
+    return this.http.post<any>(this.apiUrl, {
+      roomId,
+      landlordId,
+      fullName,
+      cccd,
+      phone,
+      address,
+      startDate,
+      endDate,
+      deposit,
+      monthlyRent,
+      notes
+    });
   }
 
   // Xem danh sách hợp đồng cá nhân (Tenant)

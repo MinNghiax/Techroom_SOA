@@ -25,18 +25,18 @@
     <div class="review-item" *ngFor="let r of reviews">
       <div class="rev-header">
         <div class="user-info">
-          <div class="avatar">{{ r.username.charAt(0) || 'U' }}</div>
+          <div class="avatar">{{ r?.username ? r.username.charAt(0) : 'U' }}</div>
           <div>
-            <div class="name">{{ r.username }}</div>
-            <div class="date">{{ r.createAt | date:'dd/MM/yyyy' }}</div>
+            <div class="name">{{ r?.username || 'Ẩn danh' }}</div>
+            <div class="date">{{ r?.createAt ? (r.createAt | date:'dd/MM/yyyy') : '' }}</div>
           </div>
         </div>
         <div class="rev-stars">
-          <span class="filled" *ngFor="let s of getStarsArray(r.rating)">★</span>
-          <span *ngFor="let s of getStarsArray(5 - r.rating)">★</span>
+          <span class="filled" *ngFor="let s of getStarsArray(r?.rating ?? 0)">★</span>
+          <span *ngFor="let s of getStarsArray(5 - (r?.rating ?? 0))">★</span>
         </div>
       </div>
-      <p class="comment">{{ r.comment }}</p>
+      <p class="comment">{{ r?.comment }}</p>
     </div>
   </div>
 </div>

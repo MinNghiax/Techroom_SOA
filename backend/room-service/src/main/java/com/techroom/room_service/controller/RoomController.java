@@ -36,8 +36,17 @@ public class RoomController {
         return ResponseEntity.ok(roomService.getRoomById(id));
     }
 
+    /**
+     * API chỉ cho phép chủ trọ (LANDLORD) truy cập để xem phòng của mình.
+     * Nếu không phải landlord sẽ trả về 403 Forbidden.
+     */
     @GetMapping("/landlord")
-    public ResponseEntity<List<RoomResponse>> getRoomsByLandlord(@RequestHeader("X-User-Id") Integer landlordId) {
+    public ResponseEntity<List<RoomResponse>> getRoomsByLandlord(
+            @RequestHeader("X-User-Id") Integer landlordId,
+            @RequestHeader(value = "X-User-Role", required = false) String role) {
+        if (role == null || !"LANDLORD".equalsIgnoreCase(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         return ResponseEntity.ok(roomService.getRoomsByLandlord(landlordId));
     }
 

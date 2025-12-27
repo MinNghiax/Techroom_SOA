@@ -27,7 +27,9 @@ public class AuthController {
     // API Đăng nhập
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest loginRequest) {
-        return ResponseEntity.ok(authService.login(loginRequest));
+        // Gọi service trả về AuthResponse chuẩn
+        AuthResponse response = authService.login(loginRequest);
+        return ResponseEntity.ok(response);
     }
 
     // API Đăng ký
@@ -47,8 +49,7 @@ public class AuthController {
                 .map(refreshTokenService::verifyExpiration)
                 .map(RefreshToken::getUser)
                 .map(user -> {
-                    String token = jwtTokenProvider.generateToken(user.getUsername());
-                    // Sử dụng Builder để tránh lỗi sai thứ tự/số lượng tham số constructor
+                    String token = jwtTokenProvider.generateToken(user);
                     AuthResponse response = AuthResponse.builder()
                             .userId(user.getId())
                             .accessToken(token)

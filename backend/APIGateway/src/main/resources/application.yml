@@ -22,7 +22,6 @@ spring:
 
       # ==== Định tuyến tới các Service thông qua Eureka ====
       routes:
-
         # 1. AUTH SERVICE (Port 8081) - Xử lý Login, Register, User
         - id: auth-service
           uri: lb://AUTH-SERVICE
@@ -44,6 +43,10 @@ spring:
       # ==== Xử lý lỗi trùng lặp Header khi qua Gateway ====
       default-filters:
         - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
+
+# ==== JWT Secret dùng cho Gateway xác thực token, đồng bộ với AuthService ====
+jwt:
+  secret: my-super-secret-key-minimum-64-characters-long-for-hs256-security-2025-room
 
 # ==== Kết nối với Discovery Server (Eureka) ====
 eureka:

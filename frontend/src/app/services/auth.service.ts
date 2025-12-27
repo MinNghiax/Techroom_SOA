@@ -28,8 +28,14 @@ export class AuthService {
         console.warn('Backend không trả về trường fullName!');
       }
 
-      // Logic xử lý role giữ nguyên
-      let roleName = res.role === 0 ? 'ADMIN' : (res.role === 1 ? 'LANDLORD' : 'TENANT');
+      // Đảm bảo luôn lưu role là chuỗi (ADMIN, LANDLORD, TENANT)
+      let roleName = res.role;
+      if (typeof roleName === 'number') {
+        roleName = roleName === 0 ? 'ADMIN' : (roleName === 1 ? 'LANDLORD' : 'TENANT');
+      } else if (typeof roleName === 'string') {
+        // Nếu backend trả về chuỗi thường, chuyển về in hoa
+        roleName = roleName.toUpperCase();
+      }
       localStorage.setItem('userRole', roleName);
     })
   );

@@ -29,38 +29,38 @@ public class AuthServiceImpl implements AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenService refreshTokenService;
 
-    @Override
-    public AuthResponse login(LoginRequest loginRequest) {
+        @Override
+        public AuthResponse login(LoginRequest loginRequest) {
         // 1. Xác thực username/password
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getUsername(),
-                        loginRequest.getPassword()
-                )
+            new UsernamePasswordAuthenticationToken(
+                loginRequest.getUsername(),
+                loginRequest.getPassword()
+            )
         );
 
         // 2. Nếu xác thực thành công, lưu vào context
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // 3. Tạo Access Token (JWT)
-        String token = jwtTokenProvider.generateToken(loginRequest.getUsername());
-
-        // 4. Lấy thông tin user
+        // 3. Lấy thông tin user
         User user = userRepository.findByUsername(loginRequest.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // 4. Tạo Access Token (JWT) với claim role là chuỗi
+        String token = jwtTokenProvider.generateToken(user);
 
         // 5. Tạo Refresh Token thật và lưu xuống DB
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getUsername());
 
         // 6. Trả về Response chứa cả 2 loại token
         return AuthResponse.builder()
-                .userId(user.getId())
-                .accessToken(token)
-                .refreshToken(refreshToken.getToken())
-                .username(user.getUsername())
-                .role(user.getRole().name())
-                .build();
-    }
+            .userId(user.getId())
+            .accessToken(token)
+            .refreshToken(refreshToken.getToken())
+            .username(user.getUsername())
+            .role(user.getRole().name())
+            .build();
+        }
 
     @Override
     @Transactional

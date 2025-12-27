@@ -27,13 +27,15 @@ public class JwtTokenProvider {
     }
     // -------------------
 
-    // Tạo Access Token từ username
-    public String generateToken(String username) {
+    // Tạo Access Token từ User, bổ sung claim userId và role (chuỗi)
+    public String generateToken(com.techroom.authservice.model.User user) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationDate);
 
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject(user.getUsername())
+                .claim("userId", user.getId())
+                .claim("role", user.getRole().name()) // LUÔN LÀ CHUỖI
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(key(), SignatureAlgorithm.HS256)

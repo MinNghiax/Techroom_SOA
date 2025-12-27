@@ -19,7 +19,9 @@ export class ReviewService {
 
   // Gửi đánh giá mới (Tenant)
   createReview(request: ReviewRequest): Observable<any> {
-    return this.http.post<any>(this.apiUrl, request);
+    // Không gửi tenantId, chỉ gửi roomId, rating, comment
+    const { roomId, rating, comment } = request;
+    return this.http.post<any>(this.apiUrl, { roomId, rating, comment });
   }
 
   // Lấy toàn bộ đánh giá (Admin)

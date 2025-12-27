@@ -26,8 +26,11 @@ public class ReviewController {
     // 2. Tenant gửi đánh giá mới
     // POST http://localhost:8082/api/reviews
     @PostMapping
-    public ResponseEntity<ReviewResponse> createReview(@RequestBody ReviewRequest request) {
-        return new ResponseEntity<>(reviewService.createReview(request), HttpStatus.CREATED);
+    public ResponseEntity<ReviewResponse> createReview(
+            @RequestBody ReviewRequest request,
+            @RequestHeader("X-User-Id") Integer tenantId
+    ) {
+        return new ResponseEntity<>(reviewService.createReview(request, tenantId), HttpStatus.CREATED);
     }
 
     // 3. (Mở rộng) Lấy tất cả đánh giá hiện có (để admin dễ test)
