@@ -16,9 +16,21 @@ public class BookingController {
     private final BookingService bookingService;
     private final ContractRepository contractRepository;
 
+    // BookingController.java
+
     @GetMapping
-    public ApiResponse<?> getAllBookings() {
-        return ApiResponse.success(contractRepository.findAll());
+    public ApiResponse<?> getBookings(
+            @RequestHeader("X-User-Id") Integer userId,
+            @RequestHeader("X-Role") String role
+    ) {
+        if ("LANDLORD".equals(role)) {
+            // Chỉ lấy hợp đồng thuộc về chủ trọ này
+            return ApiResponse.success(bookingService.getLandlordContracts(userId));
+        } else if ("ADMIN".equals(role)) {
+            // Admin mới được quyền xem tất cả
+            return ApiResponse.success(contractRepository.findAll());
+        }
+        throw new RuntimeException("Unauthorized to view all bookings");
     }
 
     // TENANT tạo booking

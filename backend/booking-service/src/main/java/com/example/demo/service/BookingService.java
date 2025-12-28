@@ -70,4 +70,8 @@ public class BookingService {
         c.setUpdatedAt(LocalDateTime.now());
         return contractRepository.save(c);
     }
+    // BookingService.java
+    public List<Contract> getLandlordContracts(Integer landlordId) {
+        return contractRepository.findByLandlordId(landlordId);
+    }
 }
