@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -48,22 +49,54 @@ public class ReviewService {
         return mapToResponse(saved);
     }
 
+    @Transactional
+    public ReviewResponse updateReview(Integer id, ReviewRequest request, Integer userId) {
+        Review review = reviewRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Đánh giá không tồn tại"));
+
+        // Kiểm tra bảo mật: Chỉ người tạo review mới được sửa
+        if (!review.getTenantId().equals(userId)) {
+            throw new RuntimeException("Bạn không có quyền chỉnh sửa đánh giá này");
+        }
+
+        review.setRating(request.getRating());
+        review.setComment(request.getComment());
+
+        return mapToResponse(reviewRepository.save(review));
+    }
+
+    /**
+     * Xóa đánh giá (Dành cho người dùng tự xóa bài của mình)
+     */
+    @Transactional
+    public void deleteMyReview(Integer id, Integer userId) {
+        Review review = reviewRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Đánh giá không tồn tại"));
+
+        // Kiểm tra bảo mật: Chỉ người tạo review mới được xóa
+        if (!review.getTenantId().equals(userId)) {
+            throw new RuntimeException("Bạn không có quyền xóa đánh giá này");
+        }
+
+        // Database có ON DELETE CASCADE sẽ tự xóa các report liên quan
+        reviewRepository.delete(review);
+    }
+
     private ReviewResponse mapToResponse(Review review) {
-        String username = null;
+        String fullName = "Người dùng #" + review.getTenantId();
         try {
-            // Gọi sang AuthService để lấy fullName
-            var userObj = restTemplate.getForObject(USER_SERVICE_URL + review.getTenantId(), java.util.Map.class);
-            if (userObj != null && userObj.get("fullName") != null) {
-                username = userObj.get("fullName").toString();
+            // Log thử xem URL có đúng không
+            Map<String, Object> userObj = restTemplate.getForObject(USER_SERVICE_URL + review.getTenantId(), Map.class);
+            if (userObj != null && userObj.containsKey("fullName")) {
+                fullName = userObj.get("fullName").toString();
             }
         } catch (Exception e) {
-            // Nếu lỗi thì fallback về "User #id"
-            username = "User #" + review.getTenantId();
+            // Fallback giữ nguyên ID nếu lỗi
         }
         return ReviewResponse.builder()
                 .id(review.getId())
                 .tenantId(review.getTenantId())
-                .username(username)
+                .username(fullName)
                 .rating(review.getRating())
                 .comment(review.getComment())
                 .createdAt(review.getCreatedAt())

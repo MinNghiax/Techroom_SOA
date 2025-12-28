@@ -38,4 +38,21 @@ public class ReviewController {
     public ResponseEntity<List<ReviewResponse>> getAllReviews() {
         return ResponseEntity.ok(reviewService.getAllReviews());
     }
+
+    // Thêm vào ReviewController hiện tại của bạn
+    @PutMapping("/{id}")
+    public ResponseEntity<ReviewResponse> updateReview(
+            @PathVariable Integer id,
+            @RequestBody ReviewRequest request,
+            @RequestHeader("X-User-Id") Integer userId) {
+        return ResponseEntity.ok(reviewService.updateReview(id, request, userId));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteReview(
+            @PathVariable Integer id,
+            @RequestHeader("X-User-Id") Integer userId) {
+        reviewService.deleteMyReview(id, userId);
+        return ResponseEntity.noContent().build();
+    }
 }

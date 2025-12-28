@@ -24,6 +24,9 @@
       </li>
 
       <li *ngIf="authService.getRole() === 'ADMIN'">
+        <a routerLink="/admin/reports" routerLinkActive="active">Xử lý báo cáo đánh giá</a>
+      </li>
+      <li *ngIf="authService.getRole() === 'ADMIN'">
         <a routerLink="/admin/users" routerLinkActive="active">Quản lý người dùng</a>
       </li>
       <li *ngIf="authService.getRole() === 'ADMIN'">

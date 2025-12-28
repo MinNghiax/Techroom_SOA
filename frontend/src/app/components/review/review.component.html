@@ -1,42 +1,49 @@
 <div class="review-wrapper">
-  <div class="write-review-card">
-    <h3>Để lại đánh giá của bạn</h3>
+  <div class="write-review-card" [class.editing]="isEditing">
+    <h3>{{ isEditing ? '✎ Chỉnh sửa đánh giá của bạn' : 'Để lại đánh giá của bạn' }}</h3>
     <div class="star-picker">
-      <span *ngFor="let s of stars" 
-            (click)="setRating(s)" 
-            [class.active]="s <= newReview.rating">★</span>
+      <span *ngFor="let s of stars" (click)="setRating(s)" [class.active]="s <= newReview.rating">★</span>
       <span class="rating-label">{{ newReview.rating }}/5 sao</span>
     </div>
-    <textarea [(ngModel)]="newReview.comment" placeholder="Cảm nhận của bạn về căn phòng này..."></textarea>
-    <button (click)="submitReview()" [disabled]="isSubmitting">
-      {{ isSubmitting ? 'Đang gửi...' : 'Gửi đánh giá' }}
-    </button>
+    <textarea [(ngModel)]="newReview.comment" placeholder="Cảm nhận của bạn..."></textarea>
+    <div class="actions">
+      <button (click)="submitReview()" [disabled]="isSubmitting" class="btn-primary">
+        {{ isEditing ? 'Cập nhật' : 'Gửi đánh giá' }}
+      </button>
+      <button *ngIf="isEditing" (click)="resetForm()" class="btn-cancel">Hủy</button>
+    </div>
   </div>
 
   <hr class="divider">
 
   <div class="review-list-section">
     <h3>Đánh giá từ cộng đồng ({{ reviews.length }})</h3>
-    
-    <div class="empty-msg" *ngIf="reviews.length === 0">
-      Chưa có đánh giá nào. Hãy là người đầu tiên trải nghiệm!
-    </div>
-
     <div class="review-item" *ngFor="let r of reviews">
       <div class="rev-header">
         <div class="user-info">
-          <div class="avatar">{{ r?.username ? r.username.charAt(0) : 'U' }}</div>
+          <div class="avatar">{{ r.username?.charAt(0).toUpperCase() }}</div>
           <div>
-            <div class="name">{{ r?.username || 'Ẩn danh' }}</div>
-            <div class="date">{{ r?.createAt ? (r.createAt | date:'dd/MM/yyyy') : '' }}</div>
+            <div class="name">{{ r.username }}</div>
+            <div class="date">{{ r.createdAt | date:'HH:mm dd/MM/yyyy' }}</div>
           </div>
         </div>
-        <div class="rev-stars">
-          <span class="filled" *ngFor="let s of getStarsArray(r?.rating ?? 0)">★</span>
-          <span *ngFor="let s of getStarsArray(5 - (r?.rating ?? 0))">★</span>
+        
+        <div class="rev-actions">
+          <ng-container *ngIf="authService.isAuthenticated()">
+            <div class="owner-actions" *ngIf="getCurrentUserId() === r.tenantId">
+              <button (click)="onEdit(r)" class="text-edit">Sửa</button>
+              <button (click)="onDelete(r.id)" class="text-delete">Xóa</button>
+            </div>
+            <button *ngIf="getCurrentUserId() !== r.tenantId" (click)="onReport(r.id)" class="btn-report">🚩 Báo cáo</button>
+          </ng-container>
+
+          <div class="rev-stars">
+            <span class="filled" *ngFor="let s of getStarsArray(r.rating)">★</span>
+            <span *ngFor="let s of getStarsArray(5 - r.rating)">★</span>
+          </div>
         </div>
       </div>
-      <p class="comment">{{ r?.comment }}</p>
+      <p class="comment-text">{{ r.comment }}</p>
     </div>
   </div>
 </div>

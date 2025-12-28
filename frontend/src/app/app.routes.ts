@@ -14,6 +14,7 @@ import { ManageRoomsComponent } from './components/landlord/manage-rooms/manage-
 import { ManageBuildingsComponent } from './components/landlord/manage-buildings/manage-buildings.component';
 import { AdminUsersComponent } from './components/admin/admin-users/admin-users.component';
 import { ContractManagementComponent } from './components/landlord/contract-management/contract-management.component';
+import { AdminReportComponent } from './components/admin/admin-report/admin-report.component';
 
 
 export const routes: Routes = [
@@ -43,7 +44,8 @@ export const routes: Routes = [
     canActivate: [adminGuard],
     children: [
       { path: 'users', component: AdminUsersComponent },
-      { path: 'statistics', component: StatisticsComponent }
+      { path: 'statistics', component: StatisticsComponent },
+      { path: 'reports', component: AdminReportComponent } // THÊM DÒNG NÀY
     ]
   },
 
