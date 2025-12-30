@@ -352,3 +352,22 @@ UNION ALL SELECT '', 'Reviews', COUNT(*) FROM room_db.reviews
 
 UNION ALL SELECT '=== BOOKING_DB (MEMBER 3) ===', '', NULL
 UNION ALL SELECT '', 'Contracts', COUNT(*) FROM booking_db.contracts;
+
+CREATE DATABASE IF NOT EXISTS invoice_db;
+USE invoice_db;
+
+CREATE TABLE invoices (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    contract_id INT NOT NULL,
+    tenant_id INT NOT NULL,
+    landlord_id INT NOT NULL,
+    amount DECIMAL(12,2) NOT NULL,
+    month INT NOT NULL,
+    year INT NOT NULL,
+    description VARCHAR(255),
+    status ENUM('UNPAID', 'PAID', 'FAILED', 'CANCELLED') DEFAULT 'UNPAID',
+    payment_date DATETIME,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_invoice_period (contract_id, month, year)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
