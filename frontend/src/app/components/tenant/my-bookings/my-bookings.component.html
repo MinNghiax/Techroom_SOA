@@ -14,33 +14,112 @@
       <thead class="thead-dark">
         <tr>
           <th>Mã HĐ</th>
-          <th>Người đặt</th>
-          <th>Ngày bắt đầu</th>
+          <th>Phòng</th> <th>Ngày bắt đầu</th>
           <th>Tiền thuê</th>
           <th>Trạng thái</th>
-          <th>Ghi chú</th>
-        </tr>
+          <th>Thao tác</th> </tr>
       </thead>
       <tbody>
         <tr *ngFor="let item of bookings">
-          <td><strong>{{ item.contractCode }}</strong></td>
-          <td>{{ item.fullName }}</td>
+          <td><strong>{{ item.contractCode || '#' + item.id }}</strong></td>
+          <td>{{ item.roomName || 'Phòng ' + item.roomId }}</td>
           <td>{{ item.startDate | date:'dd/MM/yyyy' }}</td>
           <td>{{ item.monthlyRent | number }} VNĐ</td>
           <td>
             <span class="badge" [ngClass]="getStatusClass(item.status)">
               {{ item.status === 'APPROVED' ? 'Đã duyệt' : 
-                 item.status === 'PENDING' ? 'Chờ duyệt' : 'Từ chối' }}
+                 (item.status === 'PENDING' ? 'Chờ duyệt' : 'Đã hủy/Từ chối') }}
             </span>
           </td>
           <td>
-            <small class="text-muted">{{ item.notes || 'Không có' }}</small>
-            <div *ngIf="item.rejectionReason" class="text-danger mt-1">
-              Lý do từ chối: {{ item.rejectionReason }}
-            </div>
+            <button class="btn-detail" (click)="viewDetail(item)">
+              Chi tiết
+            </button>
           </td>
         </tr>
       </tbody>
     </table>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showDetailModal" (click)="closeDetailModal()">
+  <div class="modal-content detail-card" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Chi tiết Hợp đồng: {{ selectedContract?.contractCode || 'Chưa cấp mã' }}</h3>
+      <button class="close-x" (click)="closeDetailModal()">&times;</button>
+    </div>
+
+    <div class="modal-body" *ngIf="selectedContract">
+      <div class="section-title">Thông tin thuê</div>
+      <div class="info-grid">
+        <div class="info-group">
+          <label>Phòng thuê:</label>
+          <p class="highlight">{{ selectedContract.roomName }}</p>
+        </div>
+        <div class="info-group">
+          <label>Giá thuê hàng tháng:</label>
+          <p class="text-primary">{{ selectedContract.monthlyRent | number }} VNĐ</p>
+        </div>
+        <div class="info-group">
+          <label>Tiền cọc:</label>
+          <p class="text-danger">{{ selectedContract.deposit | number }} VNĐ</p>
+        </div>
+        <div class="info-group">
+          <label>Trạng thái:</label>
+          <p [ngClass]="getStatusClass(selectedContract.status)">
+            {{ selectedContract.status }}
+          </p>
+        </div>
+      </div>
+
+      <div class="info-grid mt-3">
+        <div class="info-group">
+          <label>Ngày bắt đầu:</label>
+          <p>{{ selectedContract.startDate | date:'dd/MM/yyyy' }}</p>
+        </div>
+        <div class="info-group">
+          <label>Ngày kết thúc (Dự kiến):</label>
+          <p>{{ selectedContract.endDate | date:'dd/MM/yyyy' }}</p>
+        </div>
+      </div>
+
+      <div class="section-title mt-4">Thông tin đăng ký của bạn</div>
+      <div class="info-grid">
+        <div class="info-group">
+          <label>Họ tên:</label>
+          <p>{{ selectedContract.fullName }}</p>
+        </div>
+        <div class="info-group">
+          <label>CCCD:</label>
+          <p>{{ selectedContract.cccd }}</p>
+        </div>
+        <div class="info-group">
+          <label>SĐT liên hệ:</label>
+          <p>{{ selectedContract.phone }}</p>
+        </div>
+        <div class="info-group">
+          <label>Địa chỉ thường trú:</label>
+          <p>{{ selectedContract.address }}</p>
+        </div>
+      </div>
+
+      <div class="info-full mt-3">
+        <label>Ghi chú của bạn:</label>
+        <div class="notes-box">
+          {{ selectedContract.notes || 'Không có ghi chú.' }}
+        </div>
+      </div>
+
+      <div class="info-full mt-3" *ngIf="selectedContract.rejectionReason">
+        <label class="text-danger">Lý do chủ trọ từ chối:</label>
+        <div class="notes-box error-box">
+          {{ selectedContract.rejectionReason }}
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeDetailModal()">Đóng</button>
+    </div>
   </div>
 </div>

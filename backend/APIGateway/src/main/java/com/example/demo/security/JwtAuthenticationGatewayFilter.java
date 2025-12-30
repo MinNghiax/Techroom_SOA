@@ -32,6 +32,9 @@ public class JwtAuthenticationGatewayFilter implements GlobalFilter, Ordered {
         String path = request.getURI().getPath();
         String method = request.getMethod() != null ? request.getMethod().name() : "";
 
+        if (path.contains("/vnpay-callback") || path.contains("/vnpay-ipn")) {
+            return true;
+        }
         // GET các endpoint public
         if ("GET".equalsIgnoreCase(method)) {
             // 1. ƯU TIÊN KIỂM TRA: Nếu là đường dẫn quản lý thì KHÔNG phải public

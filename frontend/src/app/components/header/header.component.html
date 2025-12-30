@@ -13,6 +13,9 @@
       <li *ngIf="authService.getRole() === 'TENANT'">
         <a routerLink="/tenant/my-bookings" routerLinkActive="active">Hợp đồng đã thuê</a>
       </li>
+      <li *ngIf="authService.getRole() === 'TENANT'">
+        <a routerLink="/tenant/tenant-invoices" routerLinkActive="active">Hóa đơn của tôi</a>
+      </li>
       <li *ngIf="authService.getRole() === 'LANDLORD'">
     <a routerLink="/landlord/contract-management" routerLinkActive="active">Duyệt đặt phòng</a>
     </li>
@@ -21,6 +24,9 @@
       </li>
       <li *ngIf="authService.getRole() === 'LANDLORD'">
         <a routerLink="/landlord/manage-buildings" routerLinkActive="active">Tòa nhà của tôi</a>
+      </li>
+      <li *ngIf="authService.getRole() === 'LANDLORD'">
+        <a routerLink="/landlord/landlord-invoices" routerLinkActive="active">Quản lý Hóa đơn</a>
       </li>
 
       <li *ngIf="authService.getRole() === 'ADMIN'">

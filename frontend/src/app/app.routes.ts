@@ -15,6 +15,9 @@ import { ManageBuildingsComponent } from './components/landlord/manage-buildings
 import { AdminUsersComponent } from './components/admin/admin-users/admin-users.component';
 import { ContractManagementComponent } from './components/landlord/contract-management/contract-management.component';
 import { AdminReportComponent } from './components/admin/admin-report/admin-report.component';
+import { VnpayReturnComponent } from './components/vnpay/vnpay-return/vnpay-return.component';
+import { TenantInvoiceComponent } from './components/tenant/tenant-invoice/tenant-invoice.component';
+import { LandlordInvoiceComponent } from './components/landlord/landlord-invoice/landlord-invoice.component';
 
 
 export const routes: Routes = [
@@ -27,7 +30,8 @@ export const routes: Routes = [
     path: 'tenant', 
     canActivate: [tenantGuard],
     children: [
-      { path: 'my-bookings', component: MyBookingsComponent }
+      { path: 'my-bookings', component: MyBookingsComponent },
+      { path: 'tenant-invoices', component: TenantInvoiceComponent }
     ]
   },
   { 
@@ -36,7 +40,8 @@ export const routes: Routes = [
     children: [
       { path: 'manage-rooms', component: ManageRoomsComponent },
       { path: 'manage-buildings', component: ManageBuildingsComponent },
-      { path: 'contract-management', component: ContractManagementComponent }
+      { path: 'contract-management', component: ContractManagementComponent },
+      { path: 'landlord-invoices', component: LandlordInvoiceComponent }
     ]
   },
   { 
@@ -52,6 +57,8 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: '**', redirectTo: '' },
+
+  { path: 'tenant/vnpay-return', component: VnpayReturnComponent }
 
   
 ];

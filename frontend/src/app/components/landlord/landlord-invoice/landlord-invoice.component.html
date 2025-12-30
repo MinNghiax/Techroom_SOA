@@ -1,0 +1,117 @@
+<div class="invoice-management-container">
+  <div class="header-section">
+    <div class="title-group">
+      <i class="fas fa-file-invoice-dollar main-icon"></i>
+      <h2 class="main-title">Quản lý Hóa đơn Hàng tháng</h2>
+    </div>
+    <button class="btn-create" (click)="openCreateModal()">
+      <i class="fas fa-plus"></i> Lập hóa đơn mới
+    </button>
+  </div>
+
+  <div class="table-card">
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>Mã HĐ</th>
+          <th>Phòng & Khách thuê</th>
+          <th>Kỳ thanh toán</th>
+          <th>Tổng số tiền</th>
+          <th>Trạng thái</th>
+          <th>Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let inv of invoices">
+          <td class="id-cell">#{{ inv.id }}</td>
+          <td>
+            <div class="tenant-info">
+              <strong>Phòng {{ inv.roomNumber || 'N/A' }}</strong><br>
+              <small>ID Khách: {{ inv.tenantId }}</small>
+            </div>
+          </td>
+          <td>Tháng {{ inv.month }}/{{ inv.year }}</td>
+          <td class="amount-cell">{{ inv.amount | number }} VNĐ</td>
+          <td>
+            <span class="status-badge-text" [ngClass]="inv.status === 'PAID' ? 'paid' : 'unpaid'">
+              {{ inv.status === 'PAID' ? 'ĐÃ THANH TOÁN' : 'CHƯA THANH TOÁN' }}
+            </span>
+          </td>
+          <td>
+            <div class="action-group">
+              <button *ngIf="inv.status !== 'PAID'" 
+                      class="btn-icon approve" 
+                      (click)="markAsPaid(inv)" 
+                      title="Xác nhận đã thu tiền mặt">
+                <i class="fas fa-check-double"></i> Cập nhật 
+              </button>
+
+              <button class="btn-icon edit" (click)="editInvoice(inv)" title="Chỉnh sửa">
+                <i class="fas fa-edit"></i>Chỉnh sửa
+              </button>
+              
+              <button class="btn-icon delete" (click)="deleteInvoice(inv.id)" title="Xóa">
+                <i class="fas fa-trash-alt"></i>Xoá
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="invoices.length === 0">
+          <td colspan="6" class="text-center py-4 text-muted">Chưa có hóa đơn nào được tạo.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showModal">
+  <div class="modal-dialog">
+    <div class="modal-header">
+      <h4>{{ isEditMode ? 'Chỉnh sửa hóa đơn' : 'Lập hóa đơn mới' }}</h4>
+      <button class="close-x" (click)="closeModal()">&times;</button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Chọn khách thuê (Hợp đồng):</label>
+        <div class="select-wrapper">
+          <select class="custom-select" [(ngModel)]="invoiceForm.contractId" (change)="onContractChange()" [disabled]="isEditMode">
+            <option value="">-- Click để chọn phòng/khách --</option>
+            <option *ngFor="let c of activeContracts" [value]="c.id">
+              Phòng {{c.roomId}} - {{c.fullName}}
+            </option>
+          </select>
+          <i class="fas fa-chevron-down select-icon"></i>
+        </div>
+      </div>
+
+      <div class="row-flex">
+        <div class="form-group flex-1">
+          <label class="form-label">Dành cho tháng:</label>
+          <select class="custom-select" [(ngModel)]="invoiceForm.month">
+            <option *ngFor="let m of [1,2,3,4,5,6,7,8,9,10,11,12]" [value]="m">Tháng {{m}}</option>
+          </select>
+        </div>
+        <div class="form-group flex-1">
+          <label class="form-label">Năm:</label>
+          <input type="number" class="custom-select" [(ngModel)]="invoiceForm.year">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Số tiền cần thanh toán (VNĐ):</label>
+        <div class="amount-input-wrapper">
+          <input type="number" class="custom-select amount-input" [(ngModel)]="invoiceForm.amount" placeholder="Nhập số tiền...">
+          <span class="unit-tag">VNĐ</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-ghost" (click)="closeModal()">Hủy bỏ</button>
+      <button class="btn-solid" (click)="saveInvoice()">
+        <i class="fas fa-check"></i> {{ isEditMode ? 'Cập nhật' : 'Xác nhận tạo' }}
+      </button>
+    </div>
+  </div>
+</div>

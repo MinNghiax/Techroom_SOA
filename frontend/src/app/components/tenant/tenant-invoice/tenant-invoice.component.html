@@ -1,0 +1,40 @@
+<div class="container">
+  <h2>Hóa đơn của tôi</h2>
+
+  <div class="invoice-grid mt-4">
+    <div class="invoice-card" *ngFor="let inv of invoices" [class.is-paid]="inv.status === 'PAID'">
+      <div class="card-status-bar"></div>
+      <div class="card-content">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <span class="period">Kỳ tháng {{ inv.month }}/{{ inv.year }}</span>
+            <h3 class="amount">{{ inv.amount | number }} VNĐ</h3>
+          </div>
+          <span class="badge" [ngClass]="inv.status === 'PAID' ? 'badge-success' : 'badge-warning'">
+            {{ inv.status === 'PAID' ? 'Đã thanh toán' : 'Chưa thanh toán' }}
+          </span>
+        </div>
+
+        <p class="description">{{ inv.description }}</p>
+
+        <div class="card-info">
+          <span><i class="far fa-calendar-alt"></i> Ngày tạo: {{ inv.createdAt | date:'dd/MM/yyyy' }}</span>
+          <span *ngIf="inv.paymentDate"><i class="fas fa-check-circle"></i> Ngày trả: {{ inv.paymentDate | date:'dd/MM/yyyy' }}</span>
+        </div>
+
+        <div class="card-actions" *ngIf="inv.status !== 'PAID'">
+          <button class="btn-vnpay" (click)="handlePayment(inv.id)">
+            <img src="https://sandbox.vnpayment.vn/paymentv2/Images/brands/logo-vnpay.png" alt="vnpay" height="20">
+            Thanh toán ngay
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="invoices.length === 0" class="empty-state-container text-center mt-5">
+  <div class="empty-icon">
+    <i class="fas fa-file-invoice-dollar" style="font-size: 80px; color: #cbd5e1;"></i>
+  </div>
+  <p class="text-muted mt-3">Hiện tại bạn chưa có hóa đơn nào cần thanh toán.</p>
+</div>

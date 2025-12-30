@@ -4,6 +4,7 @@
   margin: 0 auto;
   padding: 2rem 1.5rem;
   background-color: #f8f9fa;
+  min-height: 100vh; /* Đảm bảo full màn hình */
 }
 
 /* Header styling */
@@ -66,9 +67,9 @@ h2::after {
 
 /* Table container */
 .table-responsive {
-  border-radius: 0;
+  border-radius: 12px; /* Bo góc nhẹ cho container bảng */
   overflow: hidden;
-  box-shadow: none;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); /* Thêm bóng đổ nhẹ */
   background: white;
   margin-top: 0;
 }
@@ -96,10 +97,11 @@ h2::after {
   white-space: nowrap;
 }
 
-/* Căn giữa các cột cụ thể */
+/* Căn giữa các cột: Ngày, Tiền, Trạng thái, VÀ CỘT THAO TÁC (Cột 6) */
 .table thead th:nth-child(3),
 .table thead th:nth-child(4),
-.table thead th:nth-child(5) {
+.table thead th:nth-child(5),
+.table thead th:nth-child(6) {
   text-align: center;
 }
 
@@ -121,10 +123,11 @@ h2::after {
   border: none;
 }
 
-/* Căn giữa nội dung các cột */
+/* Căn giữa nội dung các cột tương ứng */
 .table tbody td:nth-child(3),
 .table tbody td:nth-child(4),
-.table tbody td:nth-child(5) {
+.table tbody td:nth-child(5),
+.table tbody td:nth-child(6) {
   text-align: center;
 }
 
@@ -134,114 +137,178 @@ h2::after {
   font-size: 0.95rem;
 }
 
-/* Badge styling - giống như trong hình */
+/* Badge styling */
 .badge {
   padding: 0.5rem 1.25rem;
   border-radius: 25px;
   font-weight: 600;
-  font-size: 0.813rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.5px;
   display: inline-block;
   border: none;
 }
 
-.badge-success {
-  background: #10b981;
+.badge-success { background: #10b981; color: white; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2); }
+.badge-warning { background: #f59e0b; color: white; box-shadow: 0 2px 4px rgba(245, 158, 11, 0.2); }
+.badge-danger { background: #ef4444; color: white; box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2); }
+.badge-secondary { background: #6b7280; color: white; }
+
+/* --- PHẦN MỚI: Button Chi tiết --- */
+.btn-detail {
+  /* Dùng chung tông màu tím gradient của bảng để đồng bộ */
+  background: linear-gradient(135deg, #7c6fd6 0%, #a78bfa 100%);
   color: white;
-}
-
-.badge-warning {
-  background: #f59e0b;
-  color: white;
-}
-
-.badge-danger {
-  background: #ef4444;
-  color: white;
-}
-
-/* Notes styling */
-.text-muted {
-  color: #9ca3af !important;
-  font-style: italic;
-  font-size: 0.875rem;
-}
-
-.text-danger {
-  background: #fee2e2;
-  padding: 0.5rem 0.75rem;
+  border: none;
+  padding: 0.5rem 1rem;
   border-radius: 6px;
-  font-size: 0.875rem;
-  border-left: 3px solid #ef4444;
-  margin-top: 0.5rem !important;
-  color: #dc2626 !important;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(124, 111, 214, 0.3);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 }
 
-/* Responsive design */
-@media (max-width: 1024px) {
-  .table thead th,
-  .table tbody td {
-    padding: 1rem;
-    font-size: 0.875rem;
-  }
+.btn-detail:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(124, 111, 214, 0.4);
+  filter: brightness(1.1);
 }
 
+.btn-detail:active {
+  transform: translateY(0);
+}
+
+/* --- PHẦN MỚI: Modal Styles --- */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(44, 62, 80, 0.6); /* Màu nền tối xanh đậm */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1100;
+  backdrop-filter: blur(4px); /* Làm mờ nền phía sau */
+  animation: fadeIn 0.3s ease-out;
+}
+
+.detail-card {
+  background: white;
+  width: 90%;
+  max-width: 700px;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.modal-header {
+  display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 2px solid #f0f4ff;
+  padding-bottom: 1rem; margin-bottom: 1.5rem;
+}
+
+.modal-header h3 {
+  margin: 0; color: #2c3e50; font-size: 1.5rem; font-weight: 700;
+}
+
+.close-x {
+  background: none; border: none; font-size: 2rem;
+  cursor: pointer; color: #9ca3af; line-height: 1;
+  transition: color 0.2s;
+}
+
+.close-x:hover { color: #ef4444; }
+
+/* Modal Content Styling */
+.section-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #6c63ff; /* Tím chủ đạo */
+  background: #f0f4ff;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  margin: 1.5rem 0 1rem 0;
+  border-left: 4px solid #6c63ff;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.info-group label {
+  display: block; font-size: 0.85rem; color: #7f8c8d; margin-bottom: 0.25rem;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+
+.info-group p {
+  font-weight: 600; color: #2c3e50; margin: 0; font-size: 1.05rem;
+}
+
+.highlight { color: #6c63ff !important; font-size: 1.2rem !important; }
+.text-primary { color: #007bff !important; }
+.text-danger { color: #ef4444 !important; }
+
+/* Notes Box in Modal */
+.notes-box {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+  color: #495057;
+  line-height: 1.5;
+  border: 1px dashed #ced4da;
+}
+
+.error-box {
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+}
+
+/* Modal Footer */
+.modal-footer {
+  margin-top: 2rem;
+  text-align: right;
+  border-top: 1px solid #f0f4ff;
+  padding-top: 1.5rem;
+}
+
+.btn-secondary {
+  background: #e5e7eb;
+  color: #374151;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-secondary:hover { background: #d1d5db; }
+
+/* Animations */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Responsive adjustments */
 @media (max-width: 768px) {
-  .container {
-    padding: 1rem;
-  }
-
-  h2 {
-    font-size: 1.5rem;
-  }
-  
-  .table thead th {
-    font-size: 0.75rem;
-    padding: 0.875rem 0.75rem;
-  }
-  
-  .table tbody td {
-    font-size: 0.813rem;
-    padding: 0.875rem 0.75rem;
-  }
-  
-  .badge {
-    font-size: 0.75rem;
-    padding: 0.4rem 1rem;
-  }
+  .info-grid { grid-template-columns: 1fr; gap: 1rem; }
+  .detail-card { width: 95%; padding: 1.5rem; }
+  .table thead th:nth-child(6), .table tbody td:nth-child(6) { text-align: center; }
+  .btn-detail { padding: 0.4rem 0.8rem; font-size: 0.75rem; }
 }
 
-@media (max-width: 576px) {
-  .container {
-    padding: 1rem 0.5rem;
-  }
-  
-  h2::after {
-    width: 50px;
-  }
-
-  .table thead th,
-  .table tbody td {
-    padding: 0.75rem 0.5rem;
-    font-size: 0.75rem;
-  }
-}
-
-/* Custom scrollbar for table */
-.table-responsive::-webkit-scrollbar {
-  height: 8px;
-}
-
-.table-responsive::-webkit-scrollbar-track {
-  background: #f1f3f4;
-}
-
-.table-responsive::-webkit-scrollbar-thumb {
-  background: #7c6fd6;
-  border-radius: 4px;
-}
-
-.table-responsive::-webkit-scrollbar-thumb:hover {
-  background: #6c5fc6;
-}
+/* Scrollbar styling */
+.table-responsive::-webkit-scrollbar { height: 8px; }
+.table-responsive::-webkit-scrollbar-track { background: #f1f3f4; }
+.table-responsive::-webkit-scrollbar-thumb { background: #7c6fd6; border-radius: 4px; }
+.table-responsive::-webkit-scrollbar-thumb:hover { background: #6c5fc6; }

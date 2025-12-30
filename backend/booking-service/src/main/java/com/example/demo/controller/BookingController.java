@@ -33,6 +33,11 @@ public class BookingController {
         throw new RuntimeException("Unauthorized to view all bookings");
     }
 
+    // Sửa lại cho đúng path mà Frontend đang gọi để hết lỗi 404
+    @GetMapping("/landlord-contracts/{landlordId}")
+    public ApiResponse<?> getContractsByLandlord(@PathVariable Integer landlordId) {
+        return ApiResponse.success(bookingService.getLandlordContracts(landlordId));
+    }
     // TENANT tạo booking
     @PostMapping
     public ApiResponse<?> create(

@@ -12,6 +12,8 @@ import { BookingService } from '../../../services/booking.service'; // Kiểm tr
 export class MyBookingsComponent implements OnInit {
   bookings: any[] = [];
   isLoading = true;
+  selectedContract: any = null;
+  showDetailModal: boolean = false;
 
   constructor(private bookingService: BookingService) {}
 
@@ -43,4 +45,15 @@ export class MyBookingsComponent implements OnInit {
       default: return 'badge-secondary';
     }
   }
+  viewDetail(contract: any) {
+    this.selectedContract = contract;
+    this.showDetailModal = true;
+  }
+
+  // 3. Hàm đóng Modal
+  closeDetailModal() {
+    this.showDetailModal = false;
+    this.selectedContract = null;
+  }
+
 }

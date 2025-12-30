@@ -1,0 +1,46 @@
+.invoice-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 25px;
+}
+
+.invoice-card {
+  background: #fff;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  position: relative;
+  transition: transform 0.3s ease;
+
+  &:hover { transform: translateY(-5px); }
+
+  .card-status-bar {
+    height: 6px;
+    background: #f59e0b; // Màu vàng cho chưa thanh toán
+  }
+
+  &.is-paid .card-status-bar {
+    background: #10b981; // Màu xanh cho đã thanh toán
+  }
+
+  .card-content { padding: 20px; }
+
+  .period { font-size: 0.9rem; color: #64748b; font-weight: 500; }
+  .amount { color: #1e293b; margin: 5px 0; font-size: 1.5rem; font-weight: 800; }
+  .description { font-size: 0.95rem; color: #475569; margin: 15px 0; }
+
+  .card-info {
+    display: flex; flex-direction: column; gap: 5px;
+    font-size: 0.85rem; color: #94a3b8;
+  }
+
+  .card-actions { margin-top: 20px; }
+
+  .btn-vnpay {
+    width: 100%; padding: 12px; border: 1px solid #005baa;
+    border-radius: 10px; background: transparent; color: #005baa;
+    font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px;
+    transition: 0.3s;
+    &:hover { background: #f0f7ff; }
+  }
+}

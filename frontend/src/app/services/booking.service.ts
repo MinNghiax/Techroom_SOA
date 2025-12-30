@@ -33,7 +33,7 @@
     createBooking(dto: BookingDTO): Observable<ApiResponse<Contract>> {
       return this.http.post<ApiResponse<Contract>>(this.apiUrl, dto, { headers: this.getHeaders() });
     }
-
+    
     // 2. Lấy danh sách cần duyệt cho CHỦ TRỌ (Backend thường là /landlord hoặc /all)
     getLandlordBookings(): Observable<ApiResponse<Contract[]>> {
       return this.http.get<ApiResponse<Contract[]>>(`${this.apiUrl}`, { headers: this.getHeaders() });
