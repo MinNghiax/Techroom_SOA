@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { InvoiceService } from '../../../services/invoice.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-vnpay-return',

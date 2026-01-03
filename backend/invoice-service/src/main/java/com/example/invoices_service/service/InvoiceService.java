@@ -39,8 +39,37 @@ public class InvoiceService {
         return invoiceRepository.save(request);
     }
 
+    @Transactional
+    public Invoice updateInvoice(Long id, Invoice updatedInvoice) {
+        return invoiceRepository.findById(id).map(invoice -> {
+            // Chặn chỉnh sửa nếu đã thanh toán
+            if ("PAID".equals(invoice.getStatus())) {
+                throw new RuntimeException("Hóa đơn đã thanh toán, không thể chỉnh sửa!");
+            }
+            invoice.setAmount(updatedInvoice.getAmount());
+            invoice.setMonth(updatedInvoice.getMonth());
+            invoice.setYear(updatedInvoice.getYear());
+            invoice.setStatus(updatedInvoice.getStatus());
+            return invoiceRepository.save(invoice);
+        }).orElseThrow(() -> new RuntimeException("Không tìm thấy hóa đơn có ID: " + id));
+    }
+
+    @Transactional
+    public void deleteInvoice(Long id) {
+        Invoice invoice = invoiceRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy hóa đơn có ID: " + id));
+
+        // Chặn xóa nếu đã thanh toán
+        if ("PAID".equals(invoice.getStatus())) {
+            throw new RuntimeException("Hóa đơn đã thanh toán, không thể xóa!");
+        }
+        invoiceRepository.delete(invoice);
+    }
+
+    // Thêm vào trong class InvoiceService
     public String createPaymentUrl(Long invoiceId) throws Exception {
-        Invoice invoice = invoiceRepository.findById(invoiceId).orElseThrow();
+        Invoice invoice = invoiceRepository.findById(invoiceId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy hóa đơn"));
 
         String vnp_TxnRef = String.valueOf(invoice.getId());
         String vnp_OrderInfo = "Thanh toan hoa don #" + vnp_TxnRef;
@@ -80,17 +109,45 @@ public class InvoiceService {
         Invoice invoice = invoiceRepository.findById(invoiceId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy hóa đơn"));
 
-        // Chỉ cập nhật nếu hóa đơn chưa được thanh toán (để tránh xử lý trùng)
-        if ("UNPAID".equals(invoice.getStatus())) {
-            if ("00".equals(code)) {
-                invoice.setStatus("PAID");
-                System.out.println("DEBUG: Invoice " + invoiceId + " updated to PAID");
-            } else {
-                invoice.setStatus("FAILED");
-                System.out.println("DEBUG: Invoice " + invoiceId + " updated to FAILED");
-            }
+        if ("UNPAID".equals(invoice.getStatus()) || "FAILED".equals(invoice.getStatus())) {
+            invoice.setStatus("00".equals(code) ? "PAID" : "FAILED");
             invoiceRepository.save(invoice);
         }
+    }
+    @Transactional
+    public String processVnPayCallback(Map<String, String> fields) {
+        // 1. Kiểm tra Checksum (Chữ ký)
+        String vnp_SecureHash = fields.get("vnp_SecureHash");
+        // Tạo bản sao để tính toán hash (không bao gồm hash cũ)
+        Map<String, String> hashFields = new HashMap<>(fields);
+        hashFields.remove("vnp_SecureHash");
+        hashFields.remove("vnp_SecureHashType");
+
+        String signValue = vnPayConfig.hashAllFields(hashFields);
+
+        if (!signValue.equals(vnp_SecureHash)) {
+            return "invalid_signature";
+        }
+
+        // 2. Kiểm tra Hóa đơn
+        Long invoiceId = Long.parseLong(fields.get("vnp_TxnRef"));
+        Invoice invoice = invoiceRepository.findById(invoiceId).orElse(null);
+        if (invoice == null) return "order_not_found";
+
+        // 3. Kiểm tra số tiền (Tránh bị hack đổi số tiền khi thanh toán)
+        // long vnp_Amount = Long.parseLong(fields.get("vnp_Amount")) / 100;
+        // if (invoice.getAmount().longValue() != vnp_Amount) return "invalid_amount";
+
+        // 4. Kiểm tra trạng thái và Cập nhật
+        if ("00".equals(fields.get("vnp_ResponseCode"))) {
+            if ("PAID".equals(invoice.getStatus())) return "already_confirmed";
+            invoice.setStatus("PAID");
+        } else {
+            invoice.setStatus("FAILED");
+        }
+
+        invoiceRepository.save(invoice);
+        return "success";
     }
 
 

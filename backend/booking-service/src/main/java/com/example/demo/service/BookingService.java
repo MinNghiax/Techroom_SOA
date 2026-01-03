@@ -74,4 +74,37 @@ public class BookingService {
     public List<Contract> getLandlordContracts(Integer landlordId) {
         return contractRepository.findByLandlordId(landlordId);
     }
+
+    // Chấm dứt hợp đồng (Chuyển sang CANCELLED)
+    public Contract terminate(Integer contractId, Integer landlordId) {
+        Contract c = contractRepository
+                .findByIdAndLandlordId(contractId, landlordId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy hợp đồng"));
+
+        // Chỉ cho phép hủy nếu đang ở trạng thái hoạt động
+        if (c.getStatus() == ContractStatus.ACTIVE || c.getStatus() == ContractStatus.APPROVED) {
+            c.setStatus(ContractStatus.CANCELLED);
+            c.setUpdatedAt(LocalDateTime.now());
+            return contractRepository.save(c);
+        } else {
+            throw new RuntimeException("Trạng thái hiện tại không thể hủy: " + c.getStatus());
+        }
+    }
+
+    // Xóa hợp đồng khỏi Database
+    public void deleteContract(Integer contractId, Integer landlordId) {
+        Contract c = contractRepository
+                .findByIdAndLandlordId(contractId, landlordId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy hợp đồng"));
+
+        // Chỉ cho phép xóa các hợp đồng không còn hiệu lực để tránh mất dữ liệu quan trọng
+        if (c.getStatus() == ContractStatus.REJECTED ||
+                c.getStatus() == ContractStatus.CANCELLED ||
+                c.getStatus() == ContractStatus.EXPIRED ||
+                c.getStatus() == ContractStatus.PENDING) {
+            contractRepository.delete(c);
+        } else {
+            throw new RuntimeException("Không thể xóa hợp đồng đang có hiệu lực (ACTIVE/APPROVED)");
+        }
+    }
 }

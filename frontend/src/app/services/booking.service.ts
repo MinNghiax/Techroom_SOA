@@ -56,4 +56,12 @@
       const body: RejectDTO = { reason: reason }; 
       return this.http.put<ApiResponse<any>>(`${this.apiUrl}/${id}/reject`, body, { headers: this.getHeaders() });
     }
+    // 6. Chấm dứt hợp đồng
+    terminate(id: number): Observable<any> {
+      return this.http.put(`${this.apiUrl}/${id}/terminate`, {});
+    }
+    // 7. Xóa hợp đồng
+    deleteContract(id: number): Observable<any> {
+      return this.http.delete(`${this.apiUrl}/${id}`);
+    }
   }

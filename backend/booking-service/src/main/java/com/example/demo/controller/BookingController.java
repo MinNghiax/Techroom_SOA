@@ -97,5 +97,16 @@ public class BookingController {
                 bookingService.reject(id, landlordId, dto.getReason())
         );
     }
+
+    @PutMapping("/{id}/terminate")
+    public ApiResponse<?> terminate(@PathVariable Integer id, @RequestHeader("X-User-Id") Integer landlordId) {
+        return ApiResponse.success(bookingService.terminate(id, landlordId));
+    }
+
+    @DeleteMapping("/{id}")
+    public ApiResponse<?> delete(@PathVariable Integer id, @RequestHeader("X-User-Id") Integer landlordId) {
+        bookingService.deleteContract(id, landlordId);
+        return ApiResponse.success("Đã xóa hợp đồng vĩnh viễn");
+    }
 }
 

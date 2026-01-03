@@ -20,24 +20,23 @@ export class ContractManagementComponent implements OnInit {
   constructor(private bookingService: BookingService) {}
 
   ngOnInit(): void {
+    // Giả lập role nếu chưa có để debug
+    if (!localStorage.getItem('role')) {
+      localStorage.setItem('role', 'LANDLORD');
+      localStorage.setItem('userId', '8');
+    }
     this.userRole = localStorage.getItem('role') || '';
     this.loadContracts();
   }
 
   loadContracts() {
-    if (!localStorage.getItem('role')) {
-    localStorage.setItem('role', 'LANDLORD');
-    localStorage.setItem('userId', '8'); // Dùng ID 8 từ log cũ của bạn
-  }
-  
-  this.userRole = localStorage.getItem('role') || '';
-  this.isLoading = true;
+    this.isLoading = true;
     this.bookingService.getLandlordBookings().subscribe({
       next: (res: ApiResponse<Contract[]>) => {
-        this.contracts = res.data; // res.data là mảng Contract[] theo Interface ApiResponse
+        this.contracts = res.data;
         this.isLoading = false;
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Lỗi tải dữ liệu:', err);
         this.isLoading = false;
       }
@@ -45,19 +44,13 @@ export class ContractManagementComponent implements OnInit {
   }
 
   approve(id: number) {
-    if (confirm('Xác nhận duyệt?')) {
+    if (confirm('Xác nhận duyệt hợp đồng này?')) {
       this.bookingService.approve(id).subscribe({
         next: (res) => {
-          if (res.success) {
-            alert('Đã duyệt thành công!');
-            this.loadContracts();
-          }
+          alert('Đã duyệt thành công!');
+          this.loadContracts();
         },
-        error: (err) => {
-          // Xem log chi tiết lỗi 500 từ Business Logic của Java
-          console.error('Lỗi từ Service Java:', err.error);
-          alert('Lỗi: ' + (err.error?.message || 'Server không xử lý được yêu cầu này'));
-        }
+        error: (err: any) => alert('Lỗi: ' + (err.error?.message || 'Không thể duyệt'))
       });
     }
   }
@@ -70,19 +63,39 @@ export class ContractManagementComponent implements OnInit {
           alert('Đã từ chối yêu cầu.');
           this.loadContracts();
         },
-        error: (err) => alert('Lỗi khi từ chối.')
+        error: (err: any) => alert('Lỗi khi từ chối.')
       });
     }
   }
 
+  // Chấm dứt hợp đồng (Chuyển sang trạng thái CANCELLED)
   terminateContract(id: number) {
-    if (confirm('Bạn có chắc muốn chấm dứt hợp đồng này?')) {
-      // Gọi service chấm dứt hợp đồng tại đây
-      console.log('Chấm dứt hợp đồng ID:', id);
+    if (confirm('Bạn có chắc muốn CHẤM DỨT hợp đồng này? Trạng thái sẽ chuyển thành CANCELLED.')) {
+      this.bookingService.terminate(id).subscribe({
+        next: () => {
+          alert('Đã chấm dứt hợp đồng thành công.');
+          this.closeDetailModal();
+          this.loadContracts();
+        },
+        error: (err: any) => alert('Lỗi: ' + (err.error?.message || 'Không thể chấm dứt'))
+      });
     }
   }
+
+  // Xóa hợp đồng vĩnh viễn
+  deleteContract(id: number) {
+    if (confirm('Bạn có chắc chắn muốn XÓA vĩnh viễn hợp đồng này khỏi hệ thống?')) {
+      this.bookingService.deleteContract(id).subscribe({
+        next: () => {
+          alert('Đã xóa dữ liệu hợp đồng thành công.');
+          this.loadContracts();
+        },
+        error: (err: any) => alert('Lỗi: ' + (err.error?.message || 'Không thể xóa'))
+      });
+    }
+  }
+
   viewDetail(id: number) {
-    // Tìm hợp đồng trong danh sách dựa trên ID
     this.selectedContract = this.contracts.find(c => c.id === id);
     this.showDetailModal = true;
   }

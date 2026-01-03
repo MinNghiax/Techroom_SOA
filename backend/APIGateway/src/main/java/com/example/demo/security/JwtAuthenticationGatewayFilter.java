@@ -32,7 +32,7 @@ public class JwtAuthenticationGatewayFilter implements GlobalFilter, Ordered {
         String path = request.getURI().getPath();
         String method = request.getMethod() != null ? request.getMethod().name() : "";
 
-        if (path.contains("/vnpay-callback") || path.contains("/vnpay-ipn")) {
+        if (path.contains("/vnpay-return") || path.contains("/vnpay-ipn")) {
             return true;
         }
         // GET các endpoint public

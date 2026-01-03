@@ -1,7 +1,7 @@
 <div class="contract-container">
   <div class="header-section">
     <h2>Quản lý Hợp đồng & Yêu cầu</h2>
-    <button class="btn-create" *ngIf="userRole === 'LANDLORD'">+ Tạo hợp đồng mới</button>
+
   </div>
 
   <div *ngIf="isLoading" class="loading-text">Đang tải dữ liệu...</div>
@@ -38,10 +38,13 @@
             <button class="btn-reject" (click)="reject(item.id)">Từ chối</button>
           </ng-container>
 
-          <ng-container *ngIf="item.status !== 'PENDING'">
-            <button class="btn-detail" (click)="viewDetail(item.id)">Chi tiết</button>
-            <button class="btn-danger" (click)="terminateContract(item.id)" *ngIf="item.status === 'ACTIVE'">Kết thúc</button>
-          </ng-container>
+          <button class="btn-detail" (click)="viewDetail(item.id)">Chi tiết</button>
+
+          <button class="btn-delete" 
+                  *ngIf="['REJECTED', 'CANCELLED', 'EXPIRED', 'PENDING'].includes(item.status)" 
+                  (click)="deleteContract(item.id)">
+            <i class="fa fa-trash"></i> Xóa
+          </button>
         </td>
       </tr>
       <tr *ngIf="contracts.length === 0">
@@ -106,6 +109,11 @@
     </div>
 
     <div class="modal-footer">
+      <button class="btn-danger" 
+              *ngIf="selectedContract?.status === 'ACTIVE' || selectedContract?.status === 'APPROVED'" 
+              (click)="terminateContract(selectedContract.id)">
+        Chấm dứt hợp đồng
+      </button>
       <button class="btn-secondary" (click)="closeDetailModal()">Đóng</button>
     </div>
   </div>

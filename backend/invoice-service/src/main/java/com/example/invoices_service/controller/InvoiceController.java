@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,55 +38,63 @@ public class InvoiceController {
         return invoiceRepository.findByTenantId(id);
     }
 
+    @PutMapping("/{id}")
+    public Invoice update(@PathVariable Long id, @RequestBody Invoice updatedInvoice) {
+        return invoiceService.updateInvoice(id, updatedInvoice);
+    }
+
+    // Thay đổi logic xóa: Gọi qua Service
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        invoiceService.deleteInvoice(id);
+    }
+
     @GetMapping("/{id}/pay-url")
     public Map<String, String> getPayUrl(@PathVariable Long id) throws Exception {
         return Map.of("url", invoiceService.createPaymentUrl(id));
     }
 
+    /**
+     * LUỒNG 1: RETURN URL (Xử lý khi trình duyệt của User redirect về)
+     * Nhiệm vụ: Xử lý dữ liệu và đưa người dùng về giao diện Frontend.
+     */
+    @GetMapping("/vnpay-return")
+    public void vnpayReturn(@RequestParam Map<String, String> queryParams,
+                            HttpServletResponse response) throws IOException {
 
-    @GetMapping("/verify")
-    public void verify(@RequestParam Long invoiceId, @RequestParam String code) {
-        // Đảm bảo invoiceService.updatePaymentStatus có thực hiện repository.save()
-        invoiceService.updatePaymentStatus(invoiceId, code);
-    }
+        // Gọi service xử lý chung (kiểm tra checksum, update status)
+        invoiceService.processVnPayCallback(queryParams);
 
-    // InvoiceController.java
-
-    @PutMapping("/{id}")
-    public Invoice update(@PathVariable Long id, @RequestBody Invoice updatedInvoice) {
-        return invoiceRepository.findById(id).map(invoice -> {
-            invoice.setAmount(updatedInvoice.getAmount());
-            invoice.setMonth(updatedInvoice.getMonth());
-            invoice.setYear(updatedInvoice.getYear());
-            invoice.setStatus(updatedInvoice.getStatus());
-            return invoiceRepository.save(invoice);
-        }).orElseThrow(() -> new RuntimeException("Không tìm thấy hóa đơn"));
-    }
-
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        invoiceRepository.deleteById(id);
-    }
-    
-    @GetMapping("/vnpay-callback")
-    public void vnpayCallback(
-            @RequestParam Map<String, String> queryParams,
-            HttpServletResponse response) throws IOException {
-
-        // vnp_TxnRef chính là invoiceId bạn đã truyền vào khi tạo URL
-        String txnRef = queryParams.get("vnp_TxnRef");
         String responseCode = queryParams.get("vnp_ResponseCode");
+        // Redirect về Angular kèm status để hiện thông báo cho User
+        String frontendUrl = "http://localhost:4200/landlord/invoices?payment_status=" + responseCode;
+        response.sendRedirect(frontendUrl);
+    }
 
-        if (txnRef != null && responseCode != null) {
-            Long invoiceId = Long.parseLong(txnRef);
+    /**
+     * LUỒNG 2: IPN URL (VNPay Server-to-Server)
+     * Nhiệm vụ: Đảm bảo dữ liệu được cập nhật dù User có tắt trình duyệt.
+     * VNPay yêu cầu phản hồi JSON đúng định dạng RspCode.
+     */
+    @GetMapping("/vnpay-ipn")
+    public Map<String, String> vnpayIpn(@RequestParam Map<String, String> queryParams) {
+        // Sử dụng chung hàm xử lý logic với luồng Return
+        String result = invoiceService.processVnPayCallback(queryParams);
 
-            // Cập nhật vào DB thông qua Service đã viết
-            invoiceService.updatePaymentStatus(invoiceId, responseCode);
-
-            // Sau khi cập nhật DB xong, Redirect người dùng về lại trang giao diện Angular
-            // Thêm tham số status để Frontend hiển thị thông báo alert nếu muốn
-            String frontendUrl = "http://localhost:4200/landlord/invoices?vnp_ResponseCode=" + responseCode;
-            response.sendRedirect(frontendUrl);
+        Map<String, String> response = new HashMap<>();
+        if ("success".equals(result) || "already_confirmed".equals(result)) {
+            response.put("RspCode", "00");
+            response.put("Message", "Confirm Success");
+        } else if ("order_not_found".equals(result)) {
+            response.put("RspCode", "01");
+            response.put("Message", "Order not found");
+        } else if ("invalid_signature".equals(result)) {
+            response.put("RspCode", "97");
+            response.put("Message", "Invalid Checksum");
+        } else {
+            response.put("RspCode", "99");
+            response.put("Message", "Unknown Error");
         }
+        return response;
     }
 }
