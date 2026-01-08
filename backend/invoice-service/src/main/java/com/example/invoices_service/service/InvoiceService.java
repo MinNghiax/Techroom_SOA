@@ -66,7 +66,6 @@ public class InvoiceService {
         invoiceRepository.delete(invoice);
     }
 
-    // Thêm vào trong class InvoiceService
     public String createPaymentUrl(Long invoiceId) throws Exception {
         Invoice invoice = invoiceRepository.findById(invoiceId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy hóa đơn"));
@@ -114,6 +113,7 @@ public class InvoiceService {
             invoiceRepository.save(invoice);
         }
     }
+
     @Transactional
     public String processVnPayCallback(Map<String, String> fields) {
         // 1. Kiểm tra Checksum (Chữ ký)
@@ -135,8 +135,8 @@ public class InvoiceService {
         if (invoice == null) return "order_not_found";
 
         // 3. Kiểm tra số tiền (Tránh bị hack đổi số tiền khi thanh toán)
-        // long vnp_Amount = Long.parseLong(fields.get("vnp_Amount")) / 100;
-        // if (invoice.getAmount().longValue() != vnp_Amount) return "invalid_amount";
+        long vnp_Amount = Long.parseLong(fields.get("vnp_Amount")) / 100;
+        if (invoice.getAmount().longValue() != vnp_Amount) return "invalid_amount";
 
         // 4. Kiểm tra trạng thái và Cập nhật
         if ("00".equals(fields.get("vnp_ResponseCode"))) {

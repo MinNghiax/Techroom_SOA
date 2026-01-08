@@ -117,4 +117,22 @@ public class RoomService {
 
     @Transactional
     public void deleteRoom(Integer id) { roomRepository.deleteById(id); }
+
+    // Trong file RoomService.java
+    @Transactional
+    public void updateStatus(Integer id, String statusName) {
+        // Tìm phòng dựa trên ID
+        Room room = roomRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Phòng không tồn tại"));
+
+        try {
+            // Chuyển đổi String từ Frontend thành Enum RoomStatus
+            // Ví dụ: "OCCUPIED" -> RoomStatus.OCCUPIED
+            RoomStatus newStatus = RoomStatus.valueOf(statusName.toUpperCase());
+            room.setStatus(newStatus);
+            roomRepository.save(room);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Trạng thái không hợp lệ: " + statusName);
+        }
+    }
 }
