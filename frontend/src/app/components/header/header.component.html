@@ -10,53 +10,58 @@
     <ul class="nav-links">
       <li><a routerLink="/rooms" routerLinkActive="active">Tìm phòng</a></li>
 
-      <li *ngIf="authService.getRole() === 'TENANT'">
-        <a routerLink="/tenant/my-bookings" routerLinkActive="active">Hợp đồng đã thuê</a>
-      </li>
-      <li *ngIf="authService.getRole() === 'TENANT'">
-        <a routerLink="/tenant/tenant-invoices" routerLinkActive="active">Hóa đơn của tôi</a>
-      </li>
-      <li *ngIf="authService.getRole() === 'LANDLORD'">
-    <a routerLink="/landlord/contract-management" routerLinkActive="active">Duyệt đặt phòng</a>
-    </li>
-      <li *ngIf="authService.getRole() === 'LANDLORD'">
-        <a routerLink="/landlord/manage-rooms" routerLinkActive="active">Quản lý phòng</a>
-      </li>
-      <li *ngIf="authService.getRole() === 'LANDLORD'">
-        <a routerLink="/landlord/manage-buildings" routerLinkActive="active">Tòa nhà của tôi</a>
-      </li>
-      <li *ngIf="authService.getRole() === 'LANDLORD'">
-        <a routerLink="/landlord/landlord-invoices" routerLinkActive="active">Quản lý Hóa đơn</a>
-      </li>
+      <!-- LANDLORD Menu -->
+      <ng-container *ngIf="authService.getRole() === 'LANDLORD'">
+        <li><a routerLink="/landlord/contract-management" routerLinkActive="active">Duyệt đặt phòng</a></li>
+        <li><a routerLink="/landlord/manage-rooms" routerLinkActive="active">Quản lý phòng</a></li>
+        <li><a routerLink="/landlord/manage-buildings" routerLinkActive="active">Tòa nhà của tôi</a></li>
+        <li><a routerLink="/landlord/landlord-invoices" routerLinkActive="active">Quản lý Hóa đơn</a></li>
+      </ng-container>
 
-      <li *ngIf="authService.getRole() === 'ADMIN'">
-        <a routerLink="/admin/reports" routerLinkActive="active">Xử lý báo cáo đánh giá</a>
-      </li>
-      <li *ngIf="authService.getRole() === 'ADMIN'">
-        <a routerLink="/admin/users" routerLinkActive="active">Quản lý người dùng</a>
-      </li>
-      <li *ngIf="authService.getRole() === 'ADMIN'">
-        <a routerLink="/admin/statistics" routerLinkActive="active">Thống kê</a>
-      </li>
+      <!-- ADMIN Menu -->
+      <ng-container *ngIf="authService.getRole() === 'ADMIN'">
+        <li><a routerLink="/admin/landlord-requests" routerLinkActive="active">Yêu cầu chủ trọ</a></li>
+        <li><a routerLink="/admin/reports" routerLinkActive="active">Xử lý báo cáo</a></li>
+        <li><a routerLink="/admin/users" routerLinkActive="active">Quản lý người dùng</a></li>
+        <li><a routerLink="/admin/statistics" routerLinkActive="active">Thống kê</a></li>
+      </ng-container>
     </ul>
 
     <div class="auth-section">
-      <ng-container *ngIf="!authService.isAuthenticated(); else loggedIn">
+      <!-- Not Logged In -->
+      <ng-container *ngIf="!authService.isAuthenticated()">
         <a routerLink="/login" class="btn-text">Đăng nhập</a>
         <a routerLink="/register" class="btn-primary">Đăng ký</a>
       </ng-container>
 
-      <ng-template #loggedIn>
+      <!-- Logged In -->
+      <ng-container *ngIf="authService.isAuthenticated()">
         <div class="user-wrapper">
-          <div class="user-info">
-            <div class="avatar-circle">{{ getFullName().charAt(0).toUpperCase() }}</div>
-            <span class="welcome">Chào, <strong>{{ getFullName() }}</strong></span>
+          <!-- User Dropdown -->
+          <div class="user-dropdown">
+            <button class="user-trigger" type="button">
+              <div class="avatar-circle">{{ getFullName().charAt(0).toUpperCase() }}</div>
+              <span class="user-name">{{ getFullName() }}</span>
+              <svg class="chevron" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M4.427 6.427l3.396 3.396a.25.25 0 00.354 0l3.396-3.396A.25.25 0 0011.396 6H4.604a.25.25 0 00-.177.427z"/>
+              </svg>
+            </button>
+
+            <ul class="dropdown-menu">
+              <!-- TENANT Dropdown Items -->
+              <ng-container *ngIf="authService.getRole() === 'TENANT'">
+                <li><a class="dropdown-item" routerLink="/landlord-request">Đăng ký chủ trọ</a></li>
+                <li><a class="dropdown-item" routerLink="/tenant/my-bookings">Hợp đồng đã thuê</a></li>
+                <li><a class="dropdown-item" routerLink="/tenant/tenant-invoices">Hóa đơn của tôi</a></li>
+                <li class="divider"></li>
+              </ng-container>
+
+              <!-- Logout for all roles -->
+              <li><a class="dropdown-item logout" (click)="onLogout()">Đăng xuất</a></li>
+            </ul>
           </div>
-          <button (click)="onLogout()" class="btn-logout">
-            <span>Đăng xuất</span>
-          </button>
         </div>
-      </ng-template>
+      </ng-container>
     </div>
   </div>
 </nav>

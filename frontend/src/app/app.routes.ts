@@ -18,6 +18,8 @@ import { AdminReportComponent } from './components/admin/admin-report/admin-repo
 import { VnpayReturnComponent } from './components/vnpay/vnpay-return/vnpay-return.component';
 import { TenantInvoiceComponent } from './components/tenant/tenant-invoice/tenant-invoice.component';
 import { LandlordInvoiceComponent } from './components/landlord/landlord-invoice/landlord-invoice.component';
+import { LandlordRequestComponent } from './components/landlord-request/landlord-request.component';
+import { LandlordRequestsComponent } from './components/admin/landlord-requests/landlord-requests.component';
 
 
 export const routes: Routes = [
@@ -44,13 +46,16 @@ export const routes: Routes = [
       { path: 'landlord-invoices', component: LandlordInvoiceComponent }
     ]
   },
+
+  { path: 'landlord-request', component: LandlordRequestComponent },
   { 
     path: 'admin', 
     canActivate: [adminGuard],
     children: [
       { path: 'users', component: AdminUsersComponent },
       { path: 'statistics', component: StatisticsComponent },
-      { path: 'reports', component: AdminReportComponent } // THÊM DÒNG NÀY
+      { path: 'reports', component: AdminReportComponent },
+      { path: 'landlord-requests', component: LandlordRequestsComponent }
     ]
   },
 
