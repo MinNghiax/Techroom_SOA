@@ -1,0 +1,162 @@
+.admin-wrapper {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f3f4f6;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* SIDEBAR STYLES */
+.sidebar {
+  width: 260px;
+  background: #111c43;
+  color: #a3aed1;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  height: 100vh;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+
+  .logo-box {
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    font-size: 1.5rem;
+    font-weight: 800;
+    
+    .tech { color: #3b82f6; }
+    .room { color: #ffffff; }
+    .badge { 
+      font-size: 0.7rem; background: #3b82f6; color: white; 
+      padding: 2px 6px; border-radius: 4px; margin-left: 8px; vertical-align: middle;
+    }
+  }
+
+  .sidebar-menu {
+    padding: 20px 0;
+    flex: 1;
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 24px;
+      color: #a3aed1;
+      text-decoration: none;
+      transition: all 0.3s;
+      border-left: 4px solid transparent;
+      font-weight: 500;
+      font-size: 0.95rem;
+
+      /* Cập nhật style cho Icon Bootstrap */
+      .icon { 
+        margin-right: 12px; 
+        font-size: 1.2rem; /* Kích thước icon */
+        vertical-align: middle;
+        line-height: 1;
+        width: 24px; /* Cố định chiều rộng để text thẳng hàng */
+        text-align: center;
+      }
+
+      &:hover {
+        background: rgba(255,255,255,0.05);
+        color: #fff;
+      }
+
+      &.active {
+        background: linear-gradient(90deg, rgba(59,130,246,0.15) 0%, transparent 100%);
+        color: #3b82f6;
+        border-left-color: #3b82f6;
+      }
+    }
+  }
+
+  .sidebar-footer {
+    padding: 20px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    
+    .btn-logout {
+      width: 100%;
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: background 0.2s;
+      font-weight: 600;
+
+      .icon { font-size: 1.1rem; } 
+
+      &:hover { background: rgba(239, 68, 68, 0.2); }
+    }
+  }
+}
+
+/* MAIN CONTENT STYLES - Giữ nguyên */
+.main-content {
+  flex: 1;
+  margin-left: 260px;
+  display: flex;
+  flex-direction: column;
+
+  .top-header {
+    height: 70px;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 30px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+
+    .page-title { font-size: 1.2rem; color: #1e293b; margin: 0; }
+    
+    .admin-profile {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 600;
+      color: #475569;
+
+      .avatar {
+        width: 36px; height: 36px;
+        background: #3b82f6; color: white;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.9rem;
+      }
+    }
+  }
+
+  .content-body {
+    padding: 0;
+    overflow-x: hidden;
+  }
+}
+.logo-box {
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 800;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    
+    /* THÊM 2 DÒNG NÀY */
+    text-decoration: none; 
+    cursor: pointer;
+    
+    .tech { color: #3b82f6; }
+    .room { color: #ffffff; }
+    .badge { 
+      font-size: 0.7rem; background: #3b82f6; color: white; 
+      padding: 2px 6px; border-radius: 4px; margin-left: 8px; vertical-align: middle;
+    }
+  }

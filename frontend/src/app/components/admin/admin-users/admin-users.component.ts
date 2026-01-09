@@ -17,10 +17,21 @@ export class AdminUsersComponent implements OnInit {
   searchTerm: string = '';
   isLoading: boolean = true;
 
-  // Logic cho Modal sửa
+  // Edit Modal
   isEditModalOpen = false;
   selectedUser: User | null = null;
   editData: UserUpdate = {};
+
+  // Create Modal
+  isCreateModalOpen = false;
+  newUser: any = {
+    username: '',
+    password: '',
+    fullName: '',
+    email: '',
+    phone: '',
+    role: 'TENANT' // Mặc định
+  };
 
   constructor(private userService: UserService) {}
 
@@ -35,13 +46,21 @@ export class AdminUsersComponent implements OnInit {
         this.users = data;
         this.filteredUsers = data;
         this.isLoading = false;
+        this.onSearch();
       },
-      error: () => this.isLoading = false
+      error: (err) => {
+        console.error('Error loading users:', err);
+        this.isLoading = false;
+      }
     });
   }
 
   onSearch(): void {
     const term = this.searchTerm.toLowerCase().trim();
+    if (!term) {
+      this.filteredUsers = this.users;
+      return;
+    }
     this.filteredUsers = this.users.filter(u => 
       u.fullName?.toLowerCase().includes(term) || 
       u.username?.toLowerCase().includes(term) ||
@@ -49,10 +68,39 @@ export class AdminUsersComponent implements OnInit {
     );
   }
 
-  // --- CHỨC NĂNG SỬA ---
+  // --- THÊM MỚI ---
+  openCreateModal(): void {
+    this.newUser = { role: 'TENANT', username: '', password: '', fullName: '', email: '', phone: '' };
+    this.isCreateModalOpen = true;
+  }
+
+  closeCreateModal(): void {
+    this.isCreateModalOpen = false;
+  }
+
+  onCreateUser(): void {
+    if (!this.newUser.username || !this.newUser.password || !this.newUser.email || !this.newUser.fullName) {
+      alert('Vui lòng điền đầy đủ các trường bắt buộc (*)');
+      return;
+    }
+
+    this.userService.createUser(this.newUser).subscribe({
+      next: (createdUser) => {
+        alert('Tạo thành viên mới thành công!');
+        this.users.unshift(createdUser);
+        this.onSearch();
+        this.closeCreateModal();
+      },
+      error: (err) => {
+        console.error('Lỗi tạo user:', err);
+        alert('Lỗi: ' + (err.error?.message || 'Không thể tạo người dùng.'));
+      }
+    });
+  }
+
+  // --- SỬA ---
   openEditModal(user: User): void {
     this.selectedUser = user;
-    // Sao chép dữ liệu sang object tạm để không ảnh hưởng bảng khi chưa lưu
     this.editData = {
       fullName: user.fullName,
       email: user.email,
@@ -73,45 +121,48 @@ export class AdminUsersComponent implements OnInit {
     if (this.selectedUser) {
       this.userService.updateUser(this.selectedUser.id, this.editData).subscribe({
         next: (updatedUser) => {
-          // Cập nhật lại dữ liệu trong danh sách cục bộ
           const index = this.users.findIndex(u => u.id === updatedUser.id);
-          if (index !== -1) {
-            this.users[index] = updatedUser;
-            this.onSearch();
-          }
-          alert('Cập nhật thông tin thành công!');
+          if (index !== -1) this.users[index] = updatedUser;
+          this.onSearch();
+          alert('Cập nhật thành công!');
           this.closeEditModal();
         },
-        error: () => alert('Lỗi: Không thể lưu thay đổi!')
+        error: (err) => alert('Lỗi cập nhật: ' + (err.error?.message || err.message))
       });
     }
   }
 
   toggleUserStatus(user: User): void {
     const newStatus = user.status === 'ACTIVE' ? 'BANNED' : 'ACTIVE';
-    const msg = newStatus === 'BANNED' ? 'KHÓA' : 'MỞ KHÓA';
-    if (confirm(`Xác nhận ${msg} tài khoản @${user.username}?`)) {
+    if (confirm(`Xác nhận thay đổi trạng thái của ${user.username}?`)) {
       this.userService.updateUser(user.id, { status: newStatus }).subscribe({
-        next: (updated) => user.status = updated.status,
-        error: () => alert('Lỗi cập nhật trạng thái!')
+        next: (updated) => {
+          user.status = updated.status;
+          alert('Đã thay đổi trạng thái!');
+        },
+        error: (err) => alert('Lỗi: ' + err.message)
       });
     }
   }
 
   onDelete(id: number): void {
-    if (confirm('Bạn chắc chắn muốn xóa thành viên này?')) {
+    if (confirm('Bạn có chắc muốn xóa người dùng này?')) {
       this.userService.deleteUser(id).subscribe({
         next: () => {
           this.users = this.users.filter(u => u.id !== id);
           this.onSearch();
+          alert('Đã xóa thành công!');
         },
-        error: () => alert('Lỗi khi xóa người dùng!')
+        error: (err) => alert('Lỗi xóa: ' + err.message)
       });
     }
   }
 
   getRoleLabel(role: any): string {
-    const roles: { [key: number]: string } = { 0: 'QUẢN TRỊ', 1: 'CHỦ NHÀ', 2: 'NGƯỜI THUÊ' };
-    return typeof role === 'number' ? roles[role] : (role || 'THÀNH VIÊN');
+    const roles: { [key: string]: string } = { 
+      'ADMIN': 'QUẢN TRỊ', 'LANDLORD': 'CHỦ NHÀ', 'TENANT': 'NGƯỜI THUÊ' 
+    };
+    const roleNum: { [key: number]: string } = { 0: 'QUẢN TRỊ', 1: 'CHỦ NHÀ', 2: 'NGƯỜI THUÊ' };
+    return typeof role === 'number' ? (roleNum[role] || 'USER') : (roles[role] || role);
   }
 }

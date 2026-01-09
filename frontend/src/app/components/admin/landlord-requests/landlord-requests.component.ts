@@ -15,7 +15,7 @@ export class LandlordRequestsComponent implements OnInit {
   requests: any[] = [];
   isLoading = false;
   errorMessage = '';
-  filterStatus = 'PENDING';
+  filterStatus = '';
 
   modalImageUrl: string | null = null;
 

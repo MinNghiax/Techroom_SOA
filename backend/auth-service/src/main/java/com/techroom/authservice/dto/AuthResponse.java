@@ -15,5 +15,6 @@ public class AuthResponse {
     private String refreshToken;
     private String tokenType = "Bearer";
     private String username;
+    private String fullName;
     private String role;
 }

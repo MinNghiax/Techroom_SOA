@@ -10,6 +10,7 @@ import com.techroom.authservice.repository.UserRepository;
 import com.techroom.authservice.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,48 +30,59 @@ public class AuthServiceImpl implements AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenService refreshTokenService;
 
-        @Override
-        public AuthResponse login(LoginRequest loginRequest) {
-        // 1. Xác thực username/password
-        Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(
-                loginRequest.getUsername(),
-                loginRequest.getPassword()
-            )
-        );
+    @Override
+    public AuthResponse login(LoginRequest loginRequest) {
+        try {
+            // 1. Tìm user trước để check status
+            User user = userRepository.findByUsername(loginRequest.getUsername())
+                    .orElseThrow(() -> new BadCredentialsException("Tên đăng nhập hoặc mật khẩu không chính xác"));
 
-        // 2. Nếu xác thực thành công, lưu vào context
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+            // 2. ✅ KIỂM TRA TÀI KHOẢN BỊ KHÓA - QUAN TRỌNG!
+            if (user.getStatus() == UserStatus.BANNED) {
+                throw new RuntimeException("Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.");
+            }
 
-        // 3. Lấy thông tin user
-        User user = userRepository.findByUsername(loginRequest.getUsername())
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            // 3. Xác thực username/password
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.getUsername(),
+                            loginRequest.getPassword()
+                    )
+            );
 
-        // 4. Tạo Access Token (JWT) với claim role là chuỗi
-        String token = jwtTokenProvider.generateToken(user);
+            // 4. Nếu xác thực thành công, lưu vào context
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // 5. Tạo Refresh Token thật và lưu xuống DB
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getUsername());
+            // 5. Tạo Access Token (JWT) với claim role là chuỗi
+            String token = jwtTokenProvider.generateToken(user);
 
-        // 6. Trả về Response chứa cả 2 loại token
-        return AuthResponse.builder()
-            .userId(user.getId())
-            .accessToken(token)
-            .refreshToken(refreshToken.getToken())
-            .username(user.getUsername())
-            .role(user.getRole().name())
-            .build();
+            // 6. Tạo Refresh Token thật và lưu xuống DB
+            RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getUsername());
+
+            // 7. Trả về Response chứa cả 2 loại token
+            return AuthResponse.builder()
+                    .userId(user.getId())
+                    .accessToken(token)
+                    .refreshToken(refreshToken.getToken())
+                    .username(user.getUsername())
+                    .fullName(user.getFullName()) // ✅ Thêm fullName
+                    .role(user.getRole().name())
+                    .build();
+
+        } catch (BadCredentialsException e) {
+            throw new BadCredentialsException("Tên đăng nhập hoặc mật khẩu không chính xác");
         }
+    }
 
     @Override
     @Transactional
     public String register(RegisterRequest request) {
         // 1. Kiểm tra tồn tại
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new RuntimeException("Username already exists!");
+            throw new RuntimeException("Tên đăng nhập đã tồn tại");
         }
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already exists!");
+            throw new RuntimeException("Email đã được sử dụng");
         }
 
         // 2. Tạo User entity
@@ -81,7 +93,7 @@ public class AuthServiceImpl implements AuthService {
                 .email(request.getEmail())
                 .phone(request.getPhone())
                 .role(request.getRole())
-                .status(UserStatus.ACTIVE)
+                .status(UserStatus.ACTIVE) // ✅ Mặc định ACTIVE
                 .build();
 
         // 3. Lưu User xuống DB
@@ -101,11 +113,12 @@ public class AuthServiceImpl implements AuthService {
             landlordRepository.save(landlord);
         }
 
-        return "User registered successfully!";
+        return "Đăng ký thành công!";
     }
 
     @Override
     public void logout(String refreshToken) {
+        // Xóa refresh token khỏi DB
         refreshTokenService.deleteByToken(refreshToken);
     }
 }

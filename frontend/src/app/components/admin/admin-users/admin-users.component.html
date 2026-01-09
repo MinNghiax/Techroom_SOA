@@ -13,7 +13,14 @@
           [(ngModel)]="searchTerm"
           (input)="onSearch()">
       </div>
-      <button class="btn-secondary" (click)="loadUsers()">Làm mới dữ liệu</button>
+      
+      <button class="btn-primary" (click)="openCreateModal()">
+        <i class="bi bi-person-plus-fill"></i> Thêm mới
+      </button>
+
+      <button class="btn-secondary" (click)="loadUsers()">
+        <i class="bi bi-arrow-clockwise"></i>
+      </button>
     </div>
   </div>
 
@@ -23,7 +30,8 @@
         <div class="loading-spinner"></div>
         <p>Đang tải danh sách thành viên...</p>
       </div>
-    } @else {
+    } 
+    @else {
       @if (filteredUsers.length > 0) {
         <div class="data-wrapper">
           <table class="user-list-table">
@@ -42,7 +50,7 @@
                   <td>
                     <div class="identity-group">
                       <span class="full-name">{{ user.fullName }}</span>
-                      <span class="user-meta">Mã: {{ user.id }} | Tài khoản: {{ user.username }}</span>
+                      <span class="user-meta">ID: {{ user.id }} | &#64;{{ user.username }}</span>
                     </div>
                   </td>
                   <td>
@@ -68,7 +76,7 @@
                       @if (user.status === 'ACTIVE') {
                         <button class="btn-small btn-lock" (click)="toggleUserStatus(user)">Khóa</button>
                       } @else {
-                        <button class="btn-small btn-unlock" (click)="toggleUserStatus(user)">Mở khóa</button>
+                        <button class="btn-small btn-unlock" (click)="toggleUserStatus(user)">Mở</button>
                       }
                       
                       <button class="btn-small btn-delete" (click)="onDelete(user.id)">Xóa</button>
@@ -91,7 +99,7 @@
     <div class="modal-backdrop">
       <div class="modal-container">
         <div class="modal-header">
-          <h2>Chỉnh sửa thông tin thành viên</h2>
+          <h2>Chỉnh sửa thông tin</h2>
           <button class="btn-close-text" (click)="closeEditModal()">Đóng</button>
         </div>
         
@@ -109,11 +117,11 @@
             <input type="text" [(ngModel)]="editData.phone">
           </div>
           <div class="field-group">
-            <label>Vai trò thành viên</label>
+            <label>Vai trò</label>
             <select [(ngModel)]="editData.role">
-              <option [value]="0">Quản trị viên (ADMIN)</option>
-              <option [value]="1">Chủ cho thuê (LANDLORD)</option>
-              <option [value]="2">Người tìm phòng (TENANT)</option>
+              <option value="ADMIN">Quản trị viên (ADMIN)</option>
+              <option value="LANDLORD">Chủ cho thuê (LANDLORD)</option>
+              <option value="TENANT">Người tìm phòng (TENANT)</option>
             </select>
           </div>
         </div>
@@ -121,6 +129,60 @@
         <div class="modal-footer">
           <button class="btn-cancel" (click)="closeEditModal()">Hủy bỏ</button>
           <button class="btn-save" (click)="onSaveUpdate()">Lưu thay đổi</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (isCreateModalOpen) {
+    <div class="modal-backdrop">
+      <div class="modal-container">
+        <div class="modal-header">
+          <h2>Thêm thành viên mới</h2>
+          <button class="btn-close-text" (click)="closeCreateModal()">Đóng</button>
+        </div>
+        
+        <div class="modal-body">
+          <div class="row-group">
+            <div class="field-group">
+              <label>Tài khoản (Username) <span class="req">*</span></label>
+              <input type="text" [(ngModel)]="newUser.username" placeholder="vd: admin_vip">
+            </div>
+            <div class="field-group">
+              <label>Mật khẩu <span class="req">*</span></label>
+              <input type="password" [(ngModel)]="newUser.password" placeholder="******">
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label>Họ và tên <span class="req">*</span></label>
+            <input type="text" [(ngModel)]="newUser.fullName" placeholder="vd: Nguyễn Văn A">
+          </div>
+
+          <div class="field-group">
+            <label>Email <span class="req">*</span></label>
+            <input type="email" [(ngModel)]="newUser.email" placeholder="email@example.com">
+          </div>
+
+          <div class="field-group">
+            <label>Số điện thoại</label>
+            <input type="text" [(ngModel)]="newUser.phone" placeholder="090...">
+          </div>
+
+          <div class="field-group">
+            <label>Vai trò</label>
+            <select [(ngModel)]="newUser.role">
+              <option value="ADMIN">Quản trị viên (ADMIN)</option>
+              <option value="LANDLORD">Chủ cho thuê (LANDLORD)</option>
+              <option value="TENANT">Người tìm phòng (TENANT)</option>
+            </select>
+            <p class="hint">* Chọn "Chủ cho thuê" để tạo tài khoản đăng bài.</p>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-cancel" (click)="closeCreateModal()">Hủy bỏ</button>
+          <button class="btn-save" (click)="onCreateUser()">Tạo tài khoản</button>
         </div>
       </div>
     </div>

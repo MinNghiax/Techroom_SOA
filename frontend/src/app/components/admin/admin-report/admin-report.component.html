@@ -1,56 +1,93 @@
-<div class="admin-report-container">
-  <div class="header-section">
-    <h2>🚩 Quản lý Báo cáo Vi phạm</h2>
-    <p>Admin xử lý các đánh giá bị người dùng khiếu nại.</p>
+<div class="admin-view">
+  <div class="view-header">
+    <div class="title-group">
+      <h1>Quản lý Báo cáo Vi phạm</h1>
+      <p>Tổng số: <strong>{{ reports.length }}</strong> báo cáo đang chờ xử lý</p>
+    </div>
+    
+    <div class="filter-tools">
+      <button class="btn-secondary" (click)="loadReports()">
+        <i class="bi bi-arrow-clockwise"></i> Làm mới
+      </button>
+    </div>
   </div>
 
-  <div class="table-responsive">
-    <table class="report-table">
-      <thead>
-        <tr>
-          <th>Người báo cáo</th>
-          <th>Nội dung bị báo cáo</th>
-          <th>Lý do & Mô tả</th>
-          <th>Trạng thái</th>
-          <th>Hành động</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (item of reports; track item.id) {
+  <div class="view-content">
+    <div class="data-wrapper">
+      <table class="report-table">
+        <thead>
           <tr>
-            <td>
-              <strong>{{ item.reporterName }}</strong><br>
-              <small>ID: {{ item.reporterId }}</small>
-            </td>
-            <td class="review-content">
-              <i class="quote">"{{ item.reviewComment }}"</i>
-              <small>Đánh giá: {{ item.rating }} sao</small>
-            </td>
-            <td>
-              <span class="reason-tag">{{ item.reason }}</span>
-              <p class="desc">{{ item.description }}</p>
-            </td>
-            <td>
-              <span class="status-badge" [ngClass]="item.status.toLowerCase()">
-                {{ item.status }}
-              </span>
-            </td>
-            <td class="actions">
-              @if (item.status === 'PENDING') {
-                <button (click)="handleReport(item.id, 'RESOLVED')" class="btn-check" title="Duyệt báo cáo">✔</button>
-                <button (click)="handleReport(item.id, 'DISMISSED')" class="btn-ignore" title="Bỏ qua báo cáo">✖</button>
-                <button (click)="deleteReview(item.id)" class="btn-delete" title="Xóa Review vi phạm">🗑 Xóa</button>
-              } @else {
-                <span class="done-text">Đã xử lý</span>
-              }
-            </td>
+            <th>Người báo cáo</th>
+            <th>Nội dung bị báo cáo</th>
+            <th>Lý do & Mô tả</th>
+            <th>Trạng thái</th>
+            <th width="180">Hành động</th>
           </tr>
-        } @empty {
-          <tr>
-            <td colspan="5" class="empty-msg">Hiện tại chưa có báo cáo nào cần xử lý.</td>
-          </tr>
-        }
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          @for (item of reports; track item.id) {
+            <tr>
+              <td>
+                <div class="user-info">
+                  <span class="username">{{ item.reporterName }}</span>
+                  <span class="sub-text">ID: #{{ item.reporterId }}</span>
+                </div>
+              </td>
+              <td class="review-cell">
+                <div class="review-box">
+                  <div class="rating">
+                    <span class="star">★</span> {{ item.rating }}/5
+                  </div>
+                  <p class="comment">"{{ item.reviewComment }}"</p>
+                </div>
+              </td>
+              <td>
+                <div class="reason-info">
+                  <span class="reason-tag">{{ item.reason }}</span>
+                  <p class="desc">{{ item.description }}</p>
+                </div>
+              </td>
+              <td>
+                <span class="status-badge" [ngClass]="{
+                  'pending': item.status === 'PENDING',
+                  'resolved': item.status === 'RESOLVED',
+                  'dismissed': item.status === 'DISMISSED'
+                }">
+                  {{ item.status === 'PENDING' ? 'Chờ xử lý' : (item.status === 'RESOLVED' ? 'Đã xử lý' : 'Đã bỏ qua') }}
+                </span>
+              </td>
+              <td>
+                <div class="action-group">
+                  @if (item.status === 'PENDING') {
+                    <button class="btn-icon check" (click)="handleReport(item.id, 'RESOLVED')" title="Duyệt báo cáo (Giữ review)">
+                      <i class="bi bi-check-lg"></i>
+                    </button>
+                    
+                    <button class="btn-icon trash" (click)="deleteReview(item.id)" title="Xóa Review vi phạm">
+                      <i class="bi bi-trash"></i>
+                    </button>
+
+                    <button class="btn-icon ignore" (click)="handleReport(item.id, 'DISMISSED')" title="Bỏ qua">
+                      <i class="bi bi-x-lg"></i>
+                    </button>
+                  } @else {
+                    <span class="done-text">
+                      <i class="bi bi-check-circle-fill"></i> Hoàn tất
+                    </span>
+                  }
+                </div>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="empty-state">
+                <i class="bi bi-shield-check"></i>
+                <p>Tuyệt vời! Không có báo cáo vi phạm nào.</p>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
