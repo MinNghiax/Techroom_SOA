@@ -25,7 +25,7 @@ export class TenantInvoiceComponent implements OnInit {
     });
   }
 
-  handlePayment(invoiceId: number) {
+  paymentVnpay(invoiceId: number) {
     this.invoiceService.getPaymentUrl(invoiceId).subscribe({
       next: (res) => {
         if (res.url) {

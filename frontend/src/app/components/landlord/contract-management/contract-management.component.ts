@@ -4,7 +4,7 @@ import { BookingService } from '../../../services/booking.service';
 import { Contract, ApiResponse } from '../../../models/booking.model';
 import { RoomService } from '../../../services/room.service';
 import { RoomRequest, RoomResponse } from '../../../models/room.model';
-import { Observable } from 'rxjs';
+
 
 @Component({
   selector: 'app-contract-management',
@@ -13,6 +13,7 @@ import { Observable } from 'rxjs';
   templateUrl: './contract-management.component.html',
   styleUrl: './contract-management.component.scss'
 })
+
 export class ContractManagementComponent implements OnInit {
   rooms: RoomResponse[] = [];
   selectedContract: any = null;
@@ -28,8 +29,6 @@ export class ContractManagementComponent implements OnInit {
       status: 'AVAILABLE', description: '', amenityIds: [], imageUrls: []
     };
     
-  // contract-management.component.ts
-
 ngOnInit(): void {
   // 1. Kiểm tra/Thiết lập Role
   if (!localStorage.getItem('role')) {
@@ -43,12 +42,12 @@ ngOnInit(): void {
   this.roomService.getRoomsByLandlord().subscribe({
     next: (roomData) => {
       this.rooms = roomData;
-      console.log('Đã tải danh sách phòng:', this.rooms); // Debug xem có buildingName không
-      this.loadContracts(); // Chỉ gọi sau khi đã có rooms
+      console.log('Đã tải danh sách phòng:', this.rooms); 
+      this.loadContracts();
     },
     error: (err) => {
       console.error('Lỗi tải phòng:', err);
-      this.loadContracts(); // Vẫn tải hợp đồng kể cả khi lỗi phòng
+      this.loadContracts(); 
     }
   });
 }
@@ -153,7 +152,6 @@ ngOnInit(): void {
     }
   }
 
-  // contract-management.component.ts
 
 viewDetail(id: number) {
   const contract = this.contracts.find(c => c.id === id);
@@ -165,7 +163,6 @@ viewDetail(id: number) {
 
     this.selectedContract = {
       ...contract,
-      // Đảm bảo truy cập đúng tên trường từ RoomResponse
       roomName: roomInfo ? roomInfo.name : 'Không xác định',
       buildingName: roomInfo ? roomInfo.buildingName : 'Không xác định'
     };

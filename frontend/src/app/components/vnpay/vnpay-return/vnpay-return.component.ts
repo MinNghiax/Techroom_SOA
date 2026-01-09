@@ -51,5 +51,5 @@ export class VnpayReturnComponent implements OnInit {
     });
   }
 
-  goToInvoices() { this.router.navigate(['/tenant/invoices']); }
+  goToInvoices() { this.router.navigate(['/tenant-invoices']); }
 }

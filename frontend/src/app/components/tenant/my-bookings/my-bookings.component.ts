@@ -1,6 +1,8 @@
+// my-bookings.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { BookingService } from '../../../services/booking.service'; // Kiểm tra đường dẫn này
+import { BookingService } from '../../../services/booking.service';
+import { RoomService } from '../../../services/room.service'; 
 
 @Component({
   selector: 'app-my-bookings',
@@ -11,15 +13,37 @@ import { BookingService } from '../../../services/booking.service'; // Kiểm tr
 })
 export class MyBookingsComponent implements OnInit {
   bookings: any[] = [];
+  rooms: any[] = []; 
   isLoading = true;
   selectedContract: any = null;
   showDetailModal: boolean = false;
 
-  constructor(private bookingService: BookingService) {}
+  constructor(
+    private bookingService: BookingService,
+    private roomService: RoomService // 3. Inject RoomService
+  ) {}
 
   ngOnInit(): void {
-    this.loadMyContracts();
+    this.loadInitialData();
   }
+
+  // 4. Load cả danh sách phòng và hợp đồng
+  loadInitialData(): void {
+  this.isLoading = true;
+  
+  // 1. Đổi getAllRooms() thành getRooms() theo gợi ý của trình biên dịch
+  // 2. Thêm kiểu dữ line cho roomRes và err để tránh lỗi "implicitly has any type"
+  this.roomService.getRooms().subscribe({ 
+    next: (roomRes: any) => { 
+      this.rooms = roomRes;
+      this.loadMyContracts();
+    },
+    error: (err: any) => {
+      console.error('Lỗi tải phòng:', err);
+      this.loadMyContracts();
+    }
+  });
+}
 
   loadMyContracts(): void {
     this.bookingService.getMyContracts().subscribe({
@@ -36,24 +60,30 @@ export class MyBookingsComponent implements OnInit {
     });
   }
 
-  // Hàm helper để hiển thị màu sắc cho trạng thái
+  // 5. Cập nhật hàm xem chi tiết để mapping buildingName/roomName
+  viewDetail(contract: any) {
+  // Tìm phòng dựa trên roomId của hợp đồng
+  const roomInfo = this.rooms.find((r: any) => r.id === contract.roomId);
+  
+  this.selectedContract = {
+    ...contract,
+    roomName: roomInfo ? roomInfo.name : 'N/A',
+    buildingName: roomInfo ? roomInfo.buildingName : 'N/A'
+  };
+  this.showDetailModal = true;
+}
+
   getStatusClass(status: string): string {
     switch (status) {
-      case 'APPROVED': return 'badge-success';
+      case 'APPROVED': case 'ACTIVE': return 'badge-success';
       case 'PENDING': return 'badge-warning';
-      case 'REJECTED': return 'badge-danger';
+      case 'REJECTED': case 'CANCELLED': return 'badge-danger';
       default: return 'badge-secondary';
     }
   }
-  viewDetail(contract: any) {
-    this.selectedContract = contract;
-    this.showDetailModal = true;
-  }
 
-  // 3. Hàm đóng Modal
   closeDetailModal() {
     this.showDetailModal = false;
     this.selectedContract = null;
   }
-
 }
