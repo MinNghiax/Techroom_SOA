@@ -2,6 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BookingService } from '../../../services/booking.service'; 
 import { Contract, ApiResponse } from '../../../models/booking.model';
+import { RoomService } from '../../../services/room.service';
+import { RoomRequest, RoomResponse } from '../../../models/room.model';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-contract-management',
@@ -11,14 +14,20 @@ import { Contract, ApiResponse } from '../../../models/booking.model';
   styleUrl: './contract-management.component.scss'
 })
 export class ContractManagementComponent implements OnInit {
+  rooms: RoomResponse[] = [];
   selectedContract: any = null;
   showDetailModal: boolean = false;
   contracts: Contract[] = [];
   isLoading: boolean = false;
   userRole: string = '';
 
-  constructor(private bookingService: BookingService) {}
+  constructor(private bookingService: BookingService, private roomService: RoomService) {}
 
+  roomForm: RoomRequest = {
+      buildingId: 0, name: '', price: 0, area: 0,
+      status: 'AVAILABLE', description: '', amenityIds: [], imageUrls: []
+    };
+    
   ngOnInit(): void {
     // Giả lập role nếu chưa có để debug
     if (!localStorage.getItem('role')) {
@@ -27,6 +36,14 @@ export class ContractManagementComponent implements OnInit {
     }
     this.userRole = localStorage.getItem('role') || '';
     this.loadContracts();
+  }
+
+  loadRooms() {
+    this.isLoading = true;
+    this.roomService.getRoomsByLandlord().subscribe({
+      next: (data) => { this.rooms = data; this.isLoading = false; },
+      error: () => this.isLoading = false
+    });
   }
 
   loadContracts() {
@@ -43,17 +60,31 @@ export class ContractManagementComponent implements OnInit {
     });
   }
 
+  // Duyệt hợp đồng 
   approve(id: number) {
-    if (confirm('Xác nhận duyệt hợp đồng này?')) {
-      this.bookingService.approve(id).subscribe({
-        next: (res) => {
-          alert('Đã duyệt thành công!');
-          this.loadContracts();
-        },
-        error: (err: any) => alert('Lỗi: ' + (err.error?.message || 'Không thể duyệt'))
-      });
-    }
+  const contract = this.contracts.find(c => c.id === id);
+  if (!contract) return;
+
+  if (confirm('Xác nhận duyệt hợp đồng này?')) {
+    this.bookingService.approve(id).subscribe({
+      next: (res) => {
+        // Cập nhật trạng thái phòng
+        this.roomService.updateRoomStatus(contract.roomId, 'OCCUPIED').subscribe({
+          next: () => {
+            alert('Đã duyệt hợp đồng và cập nhật trạng thái phòng thành công!');
+            this.loadContracts();
+          },
+          error: (err: any) => { // Thêm kiểu dữ liệu :any ở đây
+            console.error('Lỗi cập nhật trạng thái phòng:', err);
+            alert('Hợp đồng đã duyệt nhưng không thể cập nhật trạng thái phòng.');
+            this.loadContracts();
+          }
+        });
+      },
+      error: (err: any) => alert('Lỗi: ' + (err.error?.message || 'Không thể duyệt'))
+    });
   }
+}
 
   reject(id: number) {
     const reason = prompt('Nhập lý do từ chối:');
@@ -68,19 +99,31 @@ export class ContractManagementComponent implements OnInit {
     }
   }
 
-  // Chấm dứt hợp đồng (Chuyển sang trạng thái CANCELLED)
+  // Chấm dứt hợp đồng 
   terminateContract(id: number) {
-    if (confirm('Bạn có chắc muốn CHẤM DỨT hợp đồng này? Trạng thái sẽ chuyển thành CANCELLED.')) {
-      this.bookingService.terminate(id).subscribe({
-        next: () => {
-          alert('Đã chấm dứt hợp đồng thành công.');
-          this.closeDetailModal();
-          this.loadContracts();
-        },
-        error: (err: any) => alert('Lỗi: ' + (err.error?.message || 'Không thể chấm dứt'))
-      });
-    }
+  const contract = this.contracts.find(c => c.id === id);
+  if (!contract) return;
+
+  if (confirm('Bạn có chắc muốn CHẤM DỨT hợp đồng này? ')) {
+    this.bookingService.terminate(id).subscribe({
+      next: () => {
+        // Trả trạng thái phòng về AVAILABLE
+        this.roomService.updateRoomStatus(contract.roomId, 'AVAILABLE').subscribe({
+          next: () => {
+            alert('Đã chấm dứt hợp đồng.');
+            this.closeDetailModal();
+            this.loadContracts();
+          },
+          error: (err: any) => { // Thêm kiểu dữ liệu :any ở đây
+            console.error('Lỗi trả trạng thái phòng:', err);
+            this.loadContracts();
+          }
+        });
+      },
+      error: (err: any) => alert('Lỗi: ' + (err.error?.message || 'Không thể chấm dứt'))
+    });
   }
+}
 
   // Xóa hợp đồng vĩnh viễn
   deleteContract(id: number) {

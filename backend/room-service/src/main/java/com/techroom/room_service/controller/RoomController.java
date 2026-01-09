@@ -1,5 +1,11 @@
 package com.techroom.room_service.controller;
 
+// Import đầy đủ các class sau:
+import com.techroom.room_service.entity.Room;
+import com.techroom.room_service.entity.RoomStatus;
+import com.techroom.room_service.service.RoomService;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
 import com.techroom.room_service.dto.RoomRequest;
 import com.techroom.room_service.dto.RoomResponse;
 import com.techroom.room_service.entity.Amenity;
@@ -81,5 +87,15 @@ public class RoomController {
     @PostMapping("/amenities")
     public ResponseEntity<Amenity> createAmenity(@RequestBody Amenity amenity) {
         return ResponseEntity.ok(amenityRepository.save(amenity));
+    }
+    // RoomController.java
+
+    // Thêm phương thức này để xử lý yêu cầu từ Frontend
+    @PutMapping("/{id}/status")
+    public ResponseEntity<Void> updateRoomStatus(
+            @PathVariable Integer id,
+            @RequestParam String status) {
+        roomService.updateStatus(id, status);
+        return ResponseEntity.ok().build();
     }
 }

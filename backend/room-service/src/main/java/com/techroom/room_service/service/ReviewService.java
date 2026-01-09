@@ -1,5 +1,9 @@
 package com.techroom.room_service.service;
 
+// Thêm các dòng này vào phần import của RoomController.java
+import com.techroom.room_service.entity.Room;
+import com.techroom.room_service.entity.RoomStatus;
+import org.springframework.web.bind.annotation.RequestParam;
 import com.techroom.room_service.dto.ReviewRequest;
 import com.techroom.room_service.dto.ReviewResponse;
 import com.techroom.room_service.entity.Review;
@@ -101,5 +105,16 @@ public class ReviewService {
                 .comment(review.getComment())
                 .createdAt(review.getCreatedAt())
                 .build();
+    }
+    // RoomService.java
+
+    @Transactional
+    public void updateStatus(Integer id, String status) {
+        Room room = roomRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Phòng không tồn tại"));
+
+        // Chuyển string từ frontend (vd: "OCCUPIED") thành Enum RoomStatus
+        room.setStatus(RoomStatus.valueOf(status.toUpperCase()));
+        roomRepository.save(room);
     }
 }

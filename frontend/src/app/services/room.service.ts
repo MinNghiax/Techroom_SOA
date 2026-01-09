@@ -52,4 +52,11 @@ export class RoomService {
   createAmenity(data: Amenity): Observable<Amenity> {
     return this.http.post<Amenity>(`${this.apiUrl}/amenities`, data);
   }
+  updateRoomStatus(roomId: number, status: string): Observable<any> {
+  // Đảm bảo đường dẫn API khớp với Backend của bạn
+  // Ví dụ: /api/rooms/1/status?status=OCCUPIED
+  return this.http.put(`${this.apiUrl}/${roomId}/status`, null, {
+    params: { status: status }
+  });
+}
 }
