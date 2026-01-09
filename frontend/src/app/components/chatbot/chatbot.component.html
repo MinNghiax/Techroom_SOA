@@ -1,0 +1,67 @@
+<div class="chat-toggle" (click)="toggleChat()" [class.hide]="showChat">
+  <img src="assets/img/chatbot-logo.png" alt="Chat" onerror="this.src='https://cdn-icons-png.flaticon.com/512/8943/8943377.png'">
+  <div class="tooltip-msg" *ngIf="!showChat">Chat với TechRoom! 👋</div>
+</div>
+
+<div class="chat-window user-form" *ngIf="showChat && showForm">
+  <div class="chat-header">
+    <div class="header-info">
+      <img src="https://cdn-icons-png.flaticon.com/512/8943/8943377.png" alt="Bot">
+      <span>Chào khách mới!</span>
+    </div>
+    <button class="close-btn" (click)="toggleChat()">&times;</button>
+  </div>
+  <div class="form-body">
+    <p>Vui lòng cho TechRoom xin thông tin để tiện xưng hô và hỗ trợ ạ:</p>
+    <div class="input-group">
+      <label>Họ và tên</label>
+      <input [(ngModel)]="userName">
+    </div>
+    <div class="input-group">
+      <label>Số điện thoại</label>
+      <input [(ngModel)]="userPhone">
+    </div>
+    <button class="start-btn" (click)="submitUserInfo()">Bắt đầu Chat</button>
+  </div>
+</div>
+
+<div class="chat-window" *ngIf="showChat && !showForm">
+  <div class="chat-header">
+    <div class="header-info">
+      <img src="https://cdn-icons-png.flaticon.com/512/8943/8943377.png" alt="Bot">
+      <div class="status">
+        <span class="name">TechRoom AI</span>
+        <span class="online">● Đang hoạt động</span>
+      </div>
+    </div>
+    <button class="close-btn" (click)="toggleChat()">&times;</button>
+  </div>
+
+  <div class="chat-body" #chatBody>
+    <div *ngFor="let msg of messages" class="message-row" [ngClass]="msg.from">
+      <div class="avatar" *ngIf="msg.from === 'bot'">
+        <img src="https://cdn-icons-png.flaticon.com/512/8943/8943377.png">
+      </div>
+      <div class="message-bubble" [innerHTML]="msg.text"></div>
+    </div>
+    
+    <div class="message-row bot" *ngIf="isLoading">
+      <div class="avatar"><img src="https://cdn-icons-png.flaticon.com/512/8943/8943377.png"></div>
+      <div class="message-bubble typing">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="chat-footer">
+    <div class="suggestions" *ngIf="showSuggestions">
+      <button *ngFor="let chip of suggestionChips" (click)="selectSuggestion(chip)">{{chip}}</button>
+    </div>
+    <div class="input-area">
+      <input [(ngModel)]="inputText" (keydown.enter)="sendMessage()" placeholder="Nhập câu hỏi...">
+      <button (click)="sendMessage()" [disabled]="isLoading || !inputText.trim()">
+        <i class="bi bi-send-fill"></i>
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,5 @@
+
+.main-content {
+  min-height: calc(100vh - 64px); /* Trừ đi chiều cao header để footer không bị đẩy lên giữa màn hình nếu trang rỗng */
+  background-color: #f8f9fa; /* Màu nền nhẹ cho toàn trang */
+}

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { HeaderComponent } from './components/header/header.component';
+import { HeaderComponent } from './layouts/header/header.component';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -9,7 +9,6 @@ import { CommonModule } from '@angular/common';
   imports: [
     CommonModule,
     RouterOutlet,
-    HeaderComponent // Import Header để sử dụng được thẻ <app-header>
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
