@@ -43,7 +43,21 @@ public class InvoiceController {
         return invoiceService.updateInvoice(id, updatedInvoice);
     }
 
-    // Thay đổi logic xóa: Gọi qua Service
+    @GetMapping("/verify")
+    public Map<String, Object> verifyInvoice(
+            @RequestParam Long invoiceId,
+            @RequestParam String code) {
+
+        invoiceService.updatePaymentStatus(invoiceId, code);
+
+        Map<String, Object> response = new HashMap<>();
+        // Sử dụng .put() thay vì .success()
+        response.put("success", true);
+        response.put("message", "Cập nhật trạng thái thành công");
+
+        return response;
+    }
+
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
         invoiceService.deleteInvoice(id);
