@@ -1,0 +1,73 @@
+<div class="admin-landlord-requests">
+    <h2>Yêu cầu đăng ký chủ trọ</h2>
+    <div *ngIf="isLoading" class="loading">Đang tải...</div>
+    <div *ngIf="errorMessage" class="alert error">{{ errorMessage }}</div>
+
+    <div class="filter-row">
+        <label>Trạng thái:
+            <select [(ngModel)]="filterStatus" (change)="loadRequests()">
+                <option value="PENDING">Chờ duyệt</option>
+                <option value="APPROVED">Đã duyệt</option>
+                <option value="REJECTED">Đã từ chối</option>
+                <option value="">Tất cả</option>
+            </select>
+        </label>
+    </div>
+
+    <table class="requests-table" *ngIf="requests.length">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Người gửi</th>
+                <th>CCCD</th>
+                <th>Địa chỉ</th>
+                <th>Số phòng</th>
+                <th>Ảnh CCCD</th>
+                <th>Giấy phép KD</th>
+                <th>Trạng thái</th>
+                <th>Lý do từ chối</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let req of requests">
+                <td>{{ req.id }}</td>
+                <td>{{ req.user?.username }}</td>
+                <td>{{ req.cccd }}</td>
+                <td>{{ req.address }}</td>
+                <td>{{ req.expectedRoomCount }}</td>
+                <td>
+                    <button *ngIf="req.frontImagePath" (click)="showImage('front', req)">Mặt trước</button>
+                    <button *ngIf="req.backImagePath" (click)="showImage('back', req)">Mặt sau</button>
+                </td>
+                <td>
+                    <button *ngIf="req.businessLicensePath" (click)="showImage('license', req)">Xem</button>
+                </td>
+                <td>
+                    <span [ngClass]="{
+            'pending': req.status === 'PENDING',
+            'approved': req.status === 'APPROVED',
+            'rejected': req.status === 'REJECTED'
+          }">{{ req.status }}</span>
+                </td>
+                <td>{{ req.rejectionReason || '-' }}</td>
+                <td>
+                    <div class="action-buttons" *ngIf="req.status === 'PENDING'">
+                        <button (click)="approve(req.id)">Duyệt</button>
+                        <button (click)="reject(req.id)">Từ chối</button>
+                    </div>
+                    <span *ngIf="req.status !== 'PENDING'">-</span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Modal hiển thị ảnh -->
+    <div class="image-modal" *ngIf="modalImageUrl" (click)="closeImageModal()">
+        <div class="image-modal-content" (click)="$event.stopPropagation()">
+            <img [src]="modalImageUrl" alt="Ảnh" />
+            <button class="close-btn" (click)="closeImageModal()">Đóng</button>
+        </div>
+    </div>
+    <div *ngIf="!isLoading && !requests.length" class="empty">Không có yêu cầu nào.</div>
+</div>

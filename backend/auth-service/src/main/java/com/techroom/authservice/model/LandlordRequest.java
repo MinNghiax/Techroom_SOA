@@ -46,7 +46,7 @@ public class LandlordRequest {
     @Column(name = "back_image_path", nullable = false)
     private String backImagePath;
 
-    @Column(name = "business_license_path", nullable = false)
+    @Column(name = "business_license_path")
     private String businessLicensePath;
 
     @Enumerated(EnumType.STRING)

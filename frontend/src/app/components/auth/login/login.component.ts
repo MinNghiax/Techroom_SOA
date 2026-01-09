@@ -12,7 +12,6 @@ import { AuthService } from '../../../services/auth.service';
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent {
-  // Đối tượng chứa thông tin đăng nhập khớp với LoginRequest của Backend
   loginData = {
     username: '',
     password: ''
@@ -20,25 +19,56 @@ export class LoginComponent {
 
   isLoading = false;
   errorMessage = '';
+  successMessage = '';
+  showPassword = false;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   onSubmit() {
-    this.isLoading = true;
+    // Reset messages
     this.errorMessage = '';
+    this.successMessage = '';
+    this.isLoading = true;
 
     this.authService.login(this.loginData).subscribe({
       next: (res) => {
-        // Lưu thông tin từ AuthResponse vào máy khách
+        // Lưu thông tin vào localStorage
         localStorage.setItem('accessToken', res.accessToken);
         localStorage.setItem('userRole', res.role);
         localStorage.setItem('username', res.username);
-        // Chuyển hướng về trang chủ sau khi thành công
-        this.router.navigate(['/']);
-      },
-      error: (err) => {
+        
+        // Lưu fullName nếu có
+        if (res.fullName) {
+          localStorage.setItem('fullName', res.fullName);
+        }
+
+        this.successMessage = 'Đăng nhập thành công! Đang chuyển hướng...';
         this.isLoading = false;
-        this.errorMessage = 'Tên đăng nhập hoặc mật khẩu không đúng!';
+
+        // Chuyển hướng sau 1.5 giây
+        setTimeout(() => {
+          this.router.navigate(['/']);
+        }, 1500);
+      },
+      error: (err: any) => {
+        this.isLoading = false;
+        
+        // Xử lý các loại lỗi khác nhau
+        if (err.status === 401) {
+          this.errorMessage = 'Tên đăng nhập hoặc mật khẩu không chính xác!';
+        } else if (err.status === 403) {
+          this.errorMessage = 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.';
+        } else if (err.status === 0) {
+          this.errorMessage = 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng.';
+        } else if (err.error?.message) {
+          this.errorMessage = err.error.message;
+        } else {
+          this.errorMessage = 'Đã xảy ra lỗi. Vui lòng thử lại sau.';
+        }
+
         console.error('Login error:', err);
       }
     });

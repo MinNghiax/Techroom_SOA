@@ -1,57 +1,212 @@
 <div class="auth-container">
-  <div class="register-card">
-    <div class="header">
-      <h2>Tạo tài khoản mới</h2>
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="logo">
+        <span class="tech">TECH</span><span class="room">ROOM</span>
+      </div>
+      <h1>Tạo tài khoản mới</h1>
       <p>Tham gia cộng đồng Techroom ngay hôm nay</p>
     </div>
 
     <form (ngSubmit)="onRegister()" #regForm="ngForm">
-      <div class="alert success" *ngIf="successMessage">{{ successMessage }}</div>
-      <div class="alert error" *ngIf="errorMessage">{{ errorMessage }}</div>
+      <!-- Alert Messages -->
+      <div class="alert-success" *ngIf="successMessage">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+        </svg>
+        <span>{{ successMessage }}</span>
+      </div>
 
+      <div class="alert-error" *ngIf="errorMessage">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+        </svg>
+        <span>{{ errorMessage }}</span>
+      </div>
+
+      <!-- Username & Full Name -->
       <div class="form-row">
-        <div class="form-group">
-          <label>Tên đăng nhập</label>
-          <input type="text" name="username" [(ngModel)]="registerData.username" required placeholder="username">
+        <div class="form-group" [class.has-error]="username.invalid && username.touched">
+          <label for="username">Tên đăng nhập</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+            </svg>
+            <input 
+              type="text" 
+              id="username" 
+              name="username" 
+              [(ngModel)]="registerData.username" 
+              required 
+              minlength="3"
+              placeholder="username"
+              #username="ngModel"
+              [disabled]="isLoading">
+          </div>
+          <span class="error-text" *ngIf="username.invalid && username.touched">
+            <span *ngIf="username.errors?.['required']">Vui lòng nhập tên đăng nhập</span>
+            <span *ngIf="username.errors?.['minlength']">Tên đăng nhập phải có ít nhất 3 ký tự</span>
+          </span>
         </div>
-        <div class="form-group">
-          <label>Họ và tên</label>
-          <input type="text" name="fullName" [(ngModel)]="registerData.fullName" required placeholder="Nguyễn Văn A">
+
+        <div class="form-group" [class.has-error]="fullName.invalid && fullName.touched">
+          <label for="fullName">Họ và tên</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"/>
+            </svg>
+            <input 
+              type="text" 
+              id="fullName" 
+              name="fullName" 
+              [(ngModel)]="registerData.fullName" 
+              required 
+              placeholder="Nguyễn Văn A"
+              #fullName="ngModel"
+              [disabled]="isLoading">
+          </div>
+          <span class="error-text" *ngIf="fullName.invalid && fullName.touched">
+            Vui lòng nhập họ và tên
+          </span>
         </div>
       </div>
 
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" name="email" [(ngModel)]="registerData.email" required placeholder="example@gmail.com">
+      <!-- Email -->
+      <div class="form-group" [class.has-error]="email.invalid && email.touched">
+        <label for="email">Email</label>
+        <div class="input-wrapper">
+          <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+          </svg>
+          <input 
+            type="email" 
+            id="email" 
+            name="email" 
+            [(ngModel)]="registerData.email" 
+            required 
+            email
+            placeholder="example@gmail.com"
+            #email="ngModel"
+            [disabled]="isLoading">
+        </div>
+        <span class="error-text" *ngIf="email.invalid && email.touched">
+          <span *ngIf="email.errors?.['required']">Vui lòng nhập email</span>
+          <span *ngIf="email.errors?.['email']">Email không hợp lệ</span>
+        </span>
       </div>
 
+      <!-- Phone -->
+      <div class="form-group" [class.has-error]="phone.invalid && phone.touched">
+        <label for="phone">Số điện thoại</label>
+        <div class="input-wrapper">
+          <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
+          </svg>
+          <input 
+            type="tel" 
+            id="phone" 
+            name="phone" 
+            [(ngModel)]="registerData.phone" 
+            required 
+            pattern="[0-9]{10,11}"
+            placeholder="0901234567"
+            #phone="ngModel"
+            [disabled]="isLoading">
+        </div>
+        <span class="error-text" *ngIf="phone.invalid && phone.touched">
+          <span *ngIf="phone.errors?.['required']">Vui lòng nhập số điện thoại</span>
+          <span *ngIf="phone.errors?.['pattern']">Số điện thoại phải có 10-11 chữ số</span>
+        </span>
+      </div>
+
+      <!-- Password & Confirm Password -->
       <div class="form-row">
-        <div class="form-group">
-          <label>Số điện thoại</label>
-          <input type="text" name="phone" [(ngModel)]="registerData.phone" required placeholder="090x xxx xxx">
+        <div class="form-group" [class.has-error]="password.invalid && password.touched">
+          <label for="password">Mật khẩu</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+            </svg>
+            <input 
+              [type]="showPassword ? 'text' : 'password'"
+              id="password" 
+              name="password" 
+              [(ngModel)]="registerData.password" 
+              required 
+              minlength="6"
+              placeholder="Ít nhất 6 ký tự"
+              #password="ngModel"
+              [disabled]="isLoading">
+            <button type="button" class="toggle-password" (click)="showPassword = !showPassword">
+              <svg *ngIf="!showPassword" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+              </svg>
+              <svg *ngIf="showPassword" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clip-rule="evenodd"/>
+                <path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z"/>
+              </svg>
+            </button>
+          </div>
+          <span class="error-text" *ngIf="password.invalid && password.touched">
+            <span *ngIf="password.errors?.['required']">Vui lòng nhập mật khẩu</span>
+            <span *ngIf="password.errors?.['minlength']">Mật khẩu phải có ít nhất 6 ký tự</span>
+          </span>
         </div>
-        <div class="form-group">
-          <label>Bạn là ai?</label>
-          <select name="role" [(ngModel)]="registerData.role" required>
-            <option value="TENANT">Người tìm phòng (Tenant)</option>
-            <option value="LANDLORD">Chủ cho thuê (Landlord)</option>
-          </select>
+
+        <div class="form-group" [class.has-error]="confirmPassword.invalid && confirmPassword.touched">
+          <label for="confirmPassword">Xác nhận mật khẩu</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+            </svg>
+            <input 
+              [type]="showConfirmPassword ? 'text' : 'password'"
+              id="confirmPassword" 
+              name="confirmPassword" 
+              [(ngModel)]="confirmPasswordValue" 
+              required 
+              placeholder="Nhập lại mật khẩu"
+              #confirmPassword="ngModel"
+              [disabled]="isLoading">
+            <button type="button" class="toggle-password" (click)="showConfirmPassword = !showConfirmPassword">
+              <svg *ngIf="!showConfirmPassword" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+              </svg>
+              <svg *ngIf="showConfirmPassword" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clip-rule="evenodd"/>
+                <path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z"/>
+              </svg>
+            </button>
+          </div>
+          <span class="error-text" *ngIf="confirmPassword.touched && !passwordsMatch()">
+            Mật khẩu xác nhận không khớp
+          </span>
         </div>
       </div>
 
-      <div class="form-group">
-        <label>Mật khẩu</label>
-        <input type="password" name="password" [(ngModel)]="registerData.password" required placeholder="••••••••">
-      </div>
-
-      <button type="submit" [disabled]="!regForm.valid || isLoading" class="btn-register">
+      <!-- Submit Button -->
+      <button type="submit" [disabled]="!regForm.valid || !passwordsMatch() || isLoading" class="btn-submit">
         <span *ngIf="!isLoading">Đăng ký tài khoản</span>
-        <span *ngIf="isLoading" class="loader"></span>
+        <span *ngIf="isLoading" class="loading">
+          <span class="spinner"></span>
+          Đang xử lý...
+        </span>
       </button>
     </form>
 
-    <div class="footer">
+    <!-- Footer -->
+    <div class="auth-footer">
       <p>Đã có tài khoản? <a routerLink="/login">Đăng nhập</a></p>
     </div>
+  </div>
+
+  <!-- Decorative Background -->
+  <div class="bg-decoration">
+    <div class="circle circle-1"></div>
+    <div class="circle circle-2"></div>
+    <div class="circle circle-3"></div>
   </div>
 </div>

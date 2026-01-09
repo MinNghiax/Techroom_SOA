@@ -22,6 +22,7 @@ public class Room {
 
     @Enumerated(EnumType.STRING)
     private RoomStatus status;
+    private String tenantName;
 
     private String description;
 

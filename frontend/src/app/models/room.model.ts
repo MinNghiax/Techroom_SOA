@@ -11,6 +11,7 @@ export interface RoomResponse {
   price: number;
   area: number;
   status: 'AVAILABLE' | 'OCCUPIED' | 'REPAIRING';
+  tenantName?: string;
   address: string;
   buildingId: number;
   buildingName: string;
