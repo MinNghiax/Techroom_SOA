@@ -4,7 +4,7 @@ import { BookingService } from '../../../services/booking.service';
 import { Contract, ApiResponse } from '../../../models/booking.model';
 import { RoomService } from '../../../services/room.service';
 import { RoomRequest, RoomResponse } from '../../../models/room.model';
-import { Observable } from 'rxjs';
+
 
 @Component({
   selector: 'app-contract-management',
@@ -13,6 +13,7 @@ import { Observable } from 'rxjs';
   templateUrl: './contract-management.component.html',
   styleUrl: './contract-management.component.scss'
 })
+
 export class ContractManagementComponent implements OnInit {
   rooms: RoomResponse[] = [];
   selectedContract: any = null;
@@ -28,15 +29,28 @@ export class ContractManagementComponent implements OnInit {
       status: 'AVAILABLE', description: '', amenityIds: [], imageUrls: []
     };
     
-  ngOnInit(): void {
-    // Giả lập role nếu chưa có để debug
-    if (!localStorage.getItem('role')) {
-      localStorage.setItem('role', 'LANDLORD');
-      localStorage.setItem('userId', '8');
-    }
-    this.userRole = localStorage.getItem('role') || '';
-    this.loadContracts();
+ngOnInit(): void {
+  // 1. Kiểm tra/Thiết lập Role
+  if (!localStorage.getItem('role')) {
+    localStorage.setItem('role', 'LANDLORD');
+    localStorage.setItem('userId', '8');
   }
+  this.userRole = localStorage.getItem('role') || '';
+
+  // 2. QUAN TRỌNG: Tải phòng trước, sau đó mới tải hợp đồng
+  this.isLoading = true;
+  this.roomService.getRoomsByLandlord().subscribe({
+    next: (roomData) => {
+      this.rooms = roomData;
+      console.log('Đã tải danh sách phòng:', this.rooms); 
+      this.loadContracts();
+    },
+    error: (err) => {
+      console.error('Lỗi tải phòng:', err);
+      this.loadContracts(); 
+    }
+  });
+}
 
   loadRooms() {
     this.isLoading = true;
@@ -138,10 +152,23 @@ export class ContractManagementComponent implements OnInit {
     }
   }
 
-  viewDetail(id: number) {
-    this.selectedContract = this.contracts.find(c => c.id === id);
+
+viewDetail(id: number) {
+  const contract = this.contracts.find(c => c.id === id);
+  if (contract) {
+    const roomInfo = this.rooms.find(r => r.id === contract.roomId);
+    
+    console.log('Contract:', contract);
+    console.log('Room tương ứng tìm được:', roomInfo);
+
+    this.selectedContract = {
+      ...contract,
+      roomName: roomInfo ? roomInfo.name : 'Không xác định',
+      buildingName: roomInfo ? roomInfo.buildingName : 'Không xác định'
+    };
     this.showDetailModal = true;
   }
+}
 
   closeDetailModal() {
     this.showDetailModal = false;
