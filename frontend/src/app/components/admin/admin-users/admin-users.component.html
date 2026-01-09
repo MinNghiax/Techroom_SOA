@@ -146,27 +146,27 @@
           <div class="row-group">
             <div class="field-group">
               <label>Tài khoản (Username) <span class="req">*</span></label>
-              <input type="text" [(ngModel)]="newUser.username" placeholder="vd: admin_vip">
+              <input type="text" [(ngModel)]="newUser.username">
             </div>
             <div class="field-group">
               <label>Mật khẩu <span class="req">*</span></label>
-              <input type="password" [(ngModel)]="newUser.password" placeholder="******">
+              <input type="password" [(ngModel)]="newUser.password">
             </div>
           </div>
 
           <div class="field-group">
             <label>Họ và tên <span class="req">*</span></label>
-            <input type="text" [(ngModel)]="newUser.fullName" placeholder="vd: Nguyễn Văn A">
+            <input type="text" [(ngModel)]="newUser.fullName">
           </div>
 
           <div class="field-group">
             <label>Email <span class="req">*</span></label>
-            <input type="email" [(ngModel)]="newUser.email" placeholder="email@example.com">
+            <input type="email" [(ngModel)]="newUser.email">
           </div>
 
           <div class="field-group">
             <label>Số điện thoại</label>
-            <input type="text" [(ngModel)]="newUser.phone" placeholder="090...">
+            <input type="text" [(ngModel)]="newUser.phone">
           </div>
 
           <div class="field-group">
@@ -176,7 +176,6 @@
               <option value="LANDLORD">Chủ cho thuê (LANDLORD)</option>
               <option value="TENANT">Người tìm phòng (TENANT)</option>
             </select>
-            <p class="hint">* Chọn "Chủ cho thuê" để tạo tài khoản đăng bài.</p>
           </div>
         </div>
 

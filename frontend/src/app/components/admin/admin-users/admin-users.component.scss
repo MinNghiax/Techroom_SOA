@@ -75,32 +75,90 @@ $gray-800: #1f2937;
     }
   }
 
-  /* MODAL */
+  /* MODAL RESPONSIVE */
   .modal-backdrop {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0,0,0,0.5); z-index: 1000; backdrop-filter: blur(4px);
     display: flex; align-items: center; justify-content: center;
+    padding: 20px; /* Thêm padding để modal không dính sát mép màn hình đt */
 
     .modal-container {
-      background: white; width: 500px; border-radius: 16px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); overflow: hidden; animation: slideDown 0.3s;
+      background: white; 
+      width: 100%; /* Chiếm full chiều ngang cho phép */
+      max-width: 550px; /* Nhưng không quá 550px */
+      border-radius: 16px; 
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); 
+      overflow: hidden; 
+      animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex; 
+      flex-direction: column;
+      max-height: 90vh; /* Tránh modal cao quá màn hình */
       
-      .modal-header { padding: 20px 24px; border-bottom: 1px solid $gray-200; display: flex; justify-content: space-between; align-items: center; h2 { margin: 0; font-size: 1.2rem; } .btn-close-text { background: none; border: none; cursor: pointer; font-weight: 600; color: $gray-500; } }
+      .modal-header { 
+        padding: 20px 24px; 
+        border-bottom: 1px solid $gray-200; 
+        display: flex; justify-content: space-between; align-items: center; 
+        background: white;
+        
+        h2 { margin: 0; font-size: 1.25rem; font-weight: 700; color: $gray-800; } 
+        .btn-close-text { background: none; border: none; cursor: pointer; font-weight: 600; color: $gray-500; padding: 5px; &:hover { color: $danger; } } 
+      }
       
       .modal-body {
         padding: 24px;
-        .row-group { display: flex; gap: 15px; .field-group { flex: 1; } }
+        overflow-y: auto; /* Cho phép cuộn nếu nội dung dài */
+
+        /* Xử lý 2 ô dính nhau & Responsive */
+        .row-group { 
+          display: flex; 
+          gap: 20px; /* Tăng khoảng cách giữa 2 ô */
+          
+          .field-group { flex: 1; }
+
+          /* Khi màn hình nhỏ hơn 600px -> Chuyển thành cột dọc */
+          @media (max-width: 600px) {
+            flex-direction: column;
+            gap: 0; /* Reset gap vì field-group đã có margin-bottom */
+          }
+        }
 
         .field-group {
-          margin-bottom: 16px;
-          label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 0.9rem; .req { color: $danger; } }
-          input, select { width: 100%; padding: 10px; border: 1px solid $gray-200; border-radius: 8px; outline: none; &:focus { border-color: $primary; } }
-          .hint { font-size: 0.8rem; color: $gray-500; margin-top: 4px; font-style: italic; }
+          margin-bottom: 20px; /* Tăng khoảng cách dưới */
+          
+          label { 
+            display: block; margin-bottom: 8px; 
+            font-weight: 600; font-size: 0.9rem; color: $gray-800;
+            .req { color: $danger; margin-left: 3px; } 
+          }
+          
+          input, select { 
+            width: 100%; 
+            padding: 12px; /* Input cao hơn cho dễ bấm trên mobile */
+            border: 1px solid $gray-200; 
+            border-radius: 8px; 
+            outline: none; 
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            box-sizing: border-box; /* Quan trọng để padding không làm vỡ layout */
+            
+            &:focus { border-color: $primary; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+          }
+          
+          .hint { font-size: 0.8rem; color: $gray-500; margin-top: 6px; font-style: italic; }
         }
       }
 
       .modal-footer {
-        padding: 20px 24px; background: $gray-100; display: flex; justify-content: flex-end; gap: 10px;
-        button { padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; &.btn-cancel { background: white; border: 1px solid $gray-200; } &.btn-save { background: $primary; color: white; } }
+        padding: 20px 24px; 
+        background: $gray-100; 
+        display: flex; justify-content: flex-end; gap: 12px;
+        border-top: 1px solid $gray-200;
+        
+        button { 
+          padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; font-size: 0.95rem;
+          &.btn-cancel { background: white; border: 1px solid $gray-200; color: $gray-500; &:hover { background: #f8fafc; } } 
+          &.btn-save { background: $primary; color: white; box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2); &:hover { background: darken($primary, 5%); } } 
+        }
       }
     }
   }
