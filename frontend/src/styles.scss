@@ -16,6 +16,10 @@ body {
   color: var(--text-main);
   margin: 0;
   line-height: 1.5;
+  /* 80px là độ cao ước tính của Header. 
+     Nếu vẫn bị che, bạn hãy tăng số này lên (ví dụ 90px) */
+  padding-top: 40px; 
+
 }
 
 input, select, textarea {

@@ -10,15 +10,25 @@
 }
 
 .navbar {
-  background: var(--bg-glass);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-  position: sticky;
+  /* 1. Đổi sang fixed để nằm yên hoàn toàn khi cuộn */
+  position: fixed; 
   top: 0;
-  z-index: 1000;
+  left: 0;
+  right: 0;
+  width: 100%;
+  
+  /* 2. Màu trắng đặc hoàn toàn */
+  background: #ffffff; 
+  
+  /* 3. Giữ nguyên các thông số quan trọng khác */
+  z-index: 1000; 
   padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
   box-shadow: var(--shadow-sm);
   transition: all 0.3s ease;
+  
+  /* Tắt hiệu ứng mờ nếu không cần thiết cho màu trắng đặc */
+  backdrop-filter: none;
 
   .container {
     max-width: 1400px;
