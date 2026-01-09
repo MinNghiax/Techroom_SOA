@@ -1,0 +1,286 @@
+<div class="request-container">
+  <div class="request-card">
+    <!-- Header -->
+    <div class="card-header">
+      <div class="header-icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+      </div>
+      <h1>Đăng ký trở thành chủ trọ</h1>
+      <p>Hoàn thành các bước xác thực để bắt đầu cho thuê phòng trên Techroom</p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #requestForm="ngForm">
+      <!-- Alert Messages -->
+      <div class="alert-success" *ngIf="successMessage">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+        </svg>
+        <span>{{ successMessage }}</span>
+      </div>
+
+      <div class="alert-error" *ngIf="errorMessage">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+        </svg>
+        <span>{{ errorMessage }}</span>
+      </div>
+
+      <!-- Personal Information Section -->
+      <div class="form-section">
+        <div class="section-title">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+          </svg>
+          <span>Thông tin cá nhân</span>
+        </div>
+
+        <!-- CCCD Number -->
+        <div class="form-group" [class.has-error]="cccd.invalid && cccd.touched">
+          <label for="cccd">
+            Số CCCD/CMND
+            <span class="required">*</span>
+          </label>
+          <div class="input-wrapper">
+            <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3.93a.75.75 0 01-.524-.213l-3.62-3.62A.75.75 0 018 13.5V8.67a1 1 0 00-.293-.707L4.293 4.55A1 1 0 014 5v6a1 1 0 11-2 0V4z" clip-rule="evenodd"/>
+            </svg>
+            <input 
+              type="text" 
+              id="cccd" 
+              name="cccd" 
+              [(ngModel)]="requestData.cccd" 
+              required 
+              pattern="[0-9]{9,12}"
+              placeholder="Nhập 9-12 chữ số"
+              #cccd="ngModel"
+              [disabled]="isLoading">
+          </div>
+          <span class="error-text" *ngIf="cccd.invalid && cccd.touched">
+            <span *ngIf="cccd.errors?.['required']">Vui lòng nhập số CCCD/CMND</span>
+            <span *ngIf="cccd.errors?.['pattern']">Số CCCD/CMND phải có 9-12 chữ số</span>
+          </span>
+        </div>
+
+        <!-- Address -->
+        <div class="form-group" [class.has-error]="address.invalid && address.touched">
+          <label for="address">
+            Địa chỉ thường trú
+            <span class="required">*</span>
+          </label>
+          <div class="input-wrapper">
+            <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+            </svg>
+            <input 
+              type="text" 
+              id="address" 
+              name="address" 
+              [(ngModel)]="requestData.address" 
+              required 
+              placeholder="Địa chỉ trên CCCD"
+              #address="ngModel"
+              [disabled]="isLoading">
+          </div>
+          <span class="error-text" *ngIf="address.invalid && address.touched">
+            Vui lòng nhập địa chỉ thường trú
+          </span>
+        </div>
+
+        <!-- Room Count -->
+        <div class="form-group" [class.has-error]="roomCount.invalid && roomCount.touched">
+          <label for="roomCount">
+            Số lượng phòng dự kiến quản lý
+            <span class="required">*</span>
+          </label>
+          <div class="input-wrapper">
+            <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
+            </svg>
+            <input 
+              type="number" 
+              id="roomCount" 
+              name="roomCount" 
+              [(ngModel)]="requestData.roomCount" 
+              required 
+              min="1"
+              max="100"
+              placeholder="Số phòng"
+              #roomCount="ngModel"
+              [disabled]="isLoading">
+          </div>
+          <span class="error-text" *ngIf="roomCount.invalid && roomCount.touched">
+            <span *ngIf="roomCount.errors?.['required']">Vui lòng nhập số lượng phòng</span>
+            <span *ngIf="roomCount.errors?.['min']">Số lượng phòng phải lớn hơn 0</span>
+          </span>
+          <span class="help-text">Nhập số lượng phòng bạn dự kiến cho thuê</span>
+        </div>
+      </div>
+
+      <!-- Document Upload Section -->
+      <div class="form-section">
+        <div class="section-title">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
+          </svg>
+          <span>Giấy tờ xác thực</span>
+        </div>
+
+        <!-- Front Image -->
+        <div class="form-group">
+          <label for="frontImage">
+            Ảnh mặt trước CCCD/CMND
+            <span class="required">*</span>
+          </label>
+          <div class="upload-area" [class.has-file]="requestData.frontImage">
+            <input 
+              type="file" 
+              id="frontImage"
+              (change)="onFileChange($event, 'frontImage')" 
+              accept="image/*" 
+              #frontImageInput
+              [disabled]="isLoading">
+            
+            <label for="frontImage" class="upload-label" *ngIf="!frontImagePreview">
+              <svg width="40" height="40" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+              </svg>
+              <span class="upload-text">Nhấn để tải lên ảnh mặt trước</span>
+              <span class="upload-hint">PNG, JPG tối đa 5MB</span>
+            </label>
+
+            <div class="image-preview" *ngIf="frontImagePreview">
+              <img [src]="frontImagePreview" alt="Preview mặt trước CCCD">
+              <div class="preview-overlay">
+                <button type="button" class="btn-change" (click)="frontImageInput.click()">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                  </svg>
+                  Thay đổi
+                </button>
+                <button type="button" class="btn-remove" (click)="removeImage('frontImage', frontImageInput)">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                  </svg>
+                  Xóa
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Back Image -->
+        <div class="form-group">
+          <label for="backImage">
+            Ảnh mặt sau CCCD/CMND
+            <span class="required">*</span>
+          </label>
+          <div class="upload-area" [class.has-file]="requestData.backImage">
+            <input 
+              type="file" 
+              id="backImage"
+              (change)="onFileChange($event, 'backImage')" 
+              accept="image/*"
+              #backImageInput
+              [disabled]="isLoading">
+            
+            <label for="backImage" class="upload-label" *ngIf="!backImagePreview">
+              <svg width="40" height="40" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+              </svg>
+              <span class="upload-text">Nhấn để tải lên ảnh mặt sau</span>
+              <span class="upload-hint">PNG, JPG tối đa 5MB</span>
+            </label>
+
+            <div class="image-preview" *ngIf="backImagePreview">
+              <img [src]="backImagePreview" alt="Preview mặt sau CCCD">
+              <div class="preview-overlay">
+                <button type="button" class="btn-change" (click)="backImageInput.click()">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                  </svg>
+                  Thay đổi
+                </button>
+                <button type="button" class="btn-remove" (click)="removeImage('backImage', backImageInput)">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                  </svg>
+                  Xóa
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- License Image (Optional) -->
+        <div class="form-group">
+          <label for="licenseImage">
+            Giấy phép kinh doanh
+            <span class="optional">(Không bắt buộc)</span>
+          </label>
+          <div class="upload-area" [class.has-file]="requestData.licenseImage">
+            <input 
+              type="file" 
+              id="licenseImage"
+              (change)="onFileChange($event, 'licenseImage')" 
+              accept="image/*"
+              #licenseImageInput
+              [disabled]="isLoading">
+            
+            <label for="licenseImage" class="upload-label" *ngIf="!licenseImagePreview">
+              <svg width="40" height="40" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+              </svg>
+              <span class="upload-text">Nhấn để tải lên giấy phép</span>
+              <span class="upload-hint">PNG, JPG tối đa 5MB (Tùy chọn)</span>
+            </label>
+
+            <div class="image-preview" *ngIf="licenseImagePreview">
+              <img [src]="licenseImagePreview" alt="Preview giấy phép">
+              <div class="preview-overlay">
+                <button type="button" class="btn-change" (click)="licenseImageInput.click()">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                  </svg>
+                  Thay đổi
+                </button>
+                <button type="button" class="btn-remove" (click)="removeImage('licenseImage', licenseImageInput)">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                  </svg>
+                  Xóa
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info Box -->
+      <div class="info-box">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+        </svg>
+        <div>
+          <strong>Lưu ý quan trọng:</strong>
+          <ul>
+            <li>Thông tin phải chính xác và trùng khớp với giấy tờ</li>
+            <li>Ảnh phải rõ nét, không bị mờ hoặc che khuất</li>
+            <li>Quá trình xét duyệt có thể mất 1-3 ngày làm việc</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit" [disabled]="!isFormValid() || isLoading" class="btn-submit">
+        <span *ngIf="!isLoading">Gửi yêu cầu xác thực</span>
+        <span *ngIf="isLoading" class="loading">
+          <span class="spinner"></span>
+          Đang xử lý...
+        </span>
+      </button>
+    </form>
+  </div>
+</div>
