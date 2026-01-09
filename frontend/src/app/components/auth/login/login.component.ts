@@ -48,9 +48,20 @@ export class LoginComponent {
         this.successMessage = 'Đăng nhập thành công! Đang chuyển hướng...';
         this.isLoading = false;
 
-        // Chuyển hướng sau 1.5 giây
+        // ✅ REDIRECT DỰA TRÊN ROLE
         setTimeout(() => {
-          this.router.navigate(['/']);
+          const role = res.role;
+          
+          if (role === 'ADMIN' || role === 0) {
+            // Admin vào thẳng dashboard thống kê
+            this.router.navigate(['/admin/statistics']);
+          } else if (role === 'LANDLORD' || role === 1) {
+            // Landlord vào quản lý phòng
+            this.router.navigate(['/landlord/manage-rooms']);
+          } else {
+            // Tenant vào trang chủ
+            this.router.navigate(['/']);
+          }
         }, 1500);
       },
       error: (err: any) => {
@@ -64,7 +75,11 @@ export class LoginComponent {
         } else if (err.status === 0) {
           this.errorMessage = 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng.';
         } else if (err.error?.message) {
+          // Backend trả về message cụ thể (ví dụ: "Tài khoản đã bị khóa")
           this.errorMessage = err.error.message;
+        } else if (err.error?.error) {
+          // Format: { "error": "Tài khoản đã bị khóa" }
+          this.errorMessage = err.error.error;
         } else {
           this.errorMessage = 'Đã xảy ra lỗi. Vui lòng thử lại sau.';
         }

@@ -24,3 +24,12 @@ export interface UserUpdate {
   status?: string;
   role?: string;
 }
+
+export interface UserCreate {
+  username?: string;
+  password?: string;
+  fullName?: string;
+  email?: string;
+  phone?: string;
+  role?: string | number;
+}

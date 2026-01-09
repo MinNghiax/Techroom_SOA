@@ -1,73 +1,125 @@
-<div class="admin-landlord-requests">
-    <h2>Yêu cầu đăng ký chủ trọ</h2>
-    <div *ngIf="isLoading" class="loading">Đang tải...</div>
-    <div *ngIf="errorMessage" class="alert error">{{ errorMessage }}</div>
-
-    <div class="filter-row">
-        <label>Trạng thái:
-            <select [(ngModel)]="filterStatus" (change)="loadRequests()">
-                <option value="PENDING">Chờ duyệt</option>
-                <option value="APPROVED">Đã duyệt</option>
-                <option value="REJECTED">Đã từ chối</option>
-                <option value="">Tất cả</option>
-            </select>
-        </label>
+<div class="admin-view">
+  <div class="view-header">
+    <div class="title-group">
+      <h1>Yêu cầu đăng ký chủ trọ</h1>
+      <p>Tổng số: <strong>{{ requests.length }}</strong> yêu cầu</p>
     </div>
 
-    <table class="requests-table" *ngIf="requests.length">
+    <div class="filter-tools">
+      <div class="select-wrapper">
+        <label>Lọc trạng thái:</label>
+        <select [(ngModel)]="filterStatus" (change)="loadRequests()">
+          <option value="PENDING">Chờ duyệt</option>
+          <option value="APPROVED">Đã duyệt</option>
+          <option value="REJECTED">Đã từ chối</option>
+          <option value="">Tất cả</option>
+        </select>
+      </div>
+      <button class="btn-secondary" (click)="loadRequests()">
+        <i class="bi bi-arrow-clockwise"></i> Làm mới
+      </button>
+    </div>
+  </div>
+
+  <div class="view-content">
+    <div *ngIf="isLoading" class="feedback-box">
+      <div class="loading-spinner"></div>
+      <p>Đang tải dữ liệu...</p>
+    </div>
+
+    <div *ngIf="errorMessage" class="alert-box error">
+      {{ errorMessage }}
+    </div>
+
+    <div class="data-wrapper" *ngIf="!isLoading && requests.length > 0">
+      <table class="request-table">
         <thead>
-            <tr>
-                <th>ID</th>
-                <th>Người gửi</th>
-                <th>CCCD</th>
-                <th>Địa chỉ</th>
-                <th>Số phòng</th>
-                <th>Ảnh CCCD</th>
-                <th>Giấy phép KD</th>
-                <th>Trạng thái</th>
-                <th>Lý do từ chối</th>
-                <th>Thao tác</th>
-            </tr>
+          <tr>
+            <th>ID</th>
+            <th>Người gửi</th>
+            <th>Thông tin CCCD</th>
+            <th>Địa chỉ / Quy mô</th>
+            <th>Hồ sơ đính kèm</th>
+            <th>Trạng thái</th>
+            <th width="200">Thao tác</th>
+          </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let req of requests">
-                <td>{{ req.id }}</td>
-                <td>{{ req.user?.username }}</td>
-                <td>{{ req.cccd }}</td>
-                <td>{{ req.address }}</td>
-                <td>{{ req.expectedRoomCount }}</td>
-                <td>
-                    <button *ngIf="req.frontImagePath" (click)="showImage('front', req)">Mặt trước</button>
-                    <button *ngIf="req.backImagePath" (click)="showImage('back', req)">Mặt sau</button>
-                </td>
-                <td>
-                    <button *ngIf="req.businessLicensePath" (click)="showImage('license', req)">Xem</button>
-                </td>
-                <td>
-                    <span [ngClass]="{
-            'pending': req.status === 'PENDING',
-            'approved': req.status === 'APPROVED',
-            'rejected': req.status === 'REJECTED'
-          }">{{ req.status }}</span>
-                </td>
-                <td>{{ req.rejectionReason || '-' }}</td>
-                <td>
-                    <div class="action-buttons" *ngIf="req.status === 'PENDING'">
-                        <button (click)="approve(req.id)">Duyệt</button>
-                        <button (click)="reject(req.id)">Từ chối</button>
-                    </div>
-                    <span *ngIf="req.status !== 'PENDING'">-</span>
-                </td>
-            </tr>
+          <tr *ngFor="let req of requests" [class.row-highlight]="req.status === 'PENDING'">
+            <td>#{{ req.id }}</td>
+            <td>
+              <div class="user-info">
+                <span class="username">{{ req.user?.username }}</span>
+                <span class="sub-text" *ngIf="req.user?.email">{{ req.user?.email }}</span>
+              </div>
+            </td>
+            <td>
+              <div class="cccd-info">
+                <strong>{{ req.cccd }}</strong>
+              </div>
+            </td>
+            <td>
+              <div class="address-info">
+                <span>{{ req.address }}</span>
+                <span class="badge-room">{{ req.expectedRoomCount }} phòng</span>
+              </div>
+            </td>
+            <td>
+              <div class="docs-grid">
+                <button class="btn-icon-text" *ngIf="req.frontImagePath" (click)="showImage('front', req)">
+                  <i class="bi bi-person-badge"></i> Trước
+                </button>
+                <button class="btn-icon-text" *ngIf="req.backImagePath" (click)="showImage('back', req)">
+                  <i class="bi bi-person-badge-fill"></i> Sau
+                </button>
+                <button class="btn-icon-text license" *ngIf="req.businessLicensePath" (click)="showImage('license', req)">
+                  <i class="bi bi-file-earmark-text"></i> GPKD
+                </button>
+              </div>
+            </td>
+            <td>
+              <span class="status-badge" [ngClass]="{
+                'pending': req.status === 'PENDING',
+                'approved': req.status === 'APPROVED',
+                'rejected': req.status === 'REJECTED'
+              }">
+                {{ req.status === 'PENDING' ? 'Chờ duyệt' : (req.status === 'APPROVED' ? 'Đã duyệt' : 'Đã từ chối') }}
+              </span>
+              <div *ngIf="req.status === 'REJECTED'" class="reject-reason">
+                Lý do: {{ req.rejectionReason }}
+              </div>
+            </td>
+            <td>
+              <div class="action-group" *ngIf="req.status === 'PENDING'">
+                <button class="btn-action approve" (click)="approve(req.id)">
+                  <i class="bi bi-check-lg"></i> Duyệt
+                </button>
+                <button class="btn-action reject" (click)="reject(req.id)">
+                  <i class="bi bi-x-lg"></i> Từ chối
+                </button>
+              </div>
+              <span *ngIf="req.status !== 'PENDING'" class="text-muted">-</span>
+            </td>
+          </tr>
         </tbody>
-    </table>
-
-    <!-- Modal hiển thị ảnh -->
-    <div class="image-modal" *ngIf="modalImageUrl" (click)="closeImageModal()">
-        <div class="image-modal-content" (click)="$event.stopPropagation()">
-            <img [src]="modalImageUrl" alt="Ảnh" />
-            <button class="close-btn" (click)="closeImageModal()">Đóng</button>
-        </div>
+      </table>
     </div>
-    <div *ngIf="!isLoading && !requests.length" class="empty">Không có yêu cầu nào.</div>
+
+    <div *ngIf="!isLoading && requests.length === 0" class="feedback-box">
+      <i class="bi bi-inbox" style="font-size: 2rem; color: #cbd5e1;"></i>
+      <p>Không có yêu cầu nào phù hợp.</p>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" *ngIf="modalImageUrl" (click)="closeImageModal()">
+    <div class="image-viewer" (click)="$event.stopPropagation()">
+      <div class="viewer-header">
+        <span>Xem hình ảnh</span>
+        <button class="btn-close-icon" (click)="closeImageModal()">&times;</button>
+      </div>
+      <div class="viewer-body">
+        <img [src]="modalImageUrl" alt="Document Image" />
+      </div>
+    </div>
+  </div>
 </div>

@@ -1,148 +1,182 @@
+/* Variables */
+$primary: #3b82f6;
+$success: #10b981;
+$danger: #ef4444;
+$warning: #f59e0b;
+$gray-100: #f3f4f6;
+$gray-200: #e5e7eb;
+$gray-500: #6b7280;
+$gray-800: #1f2937;
+
 .admin-view {
-  padding: 40px;
-  max-width: 1400px;
-  margin: 0 auto;
-  font-family: 'Inter', system-ui, sans-serif;
+  padding: 30px;
+  background-color: #f8fafc;
+  min-height: 100%;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
 
   .view-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    margin-bottom: 30px;
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;
 
     .title-group {
-      h1 { font-size: 24px; font-weight: 800; color: #0f172a; margin: 0; }
-      p { color: #64748b; font-size: 14px; margin-top: 6px; }
+      h1 { font-size: 1.5rem; font-weight: 700; color: $gray-800; margin: 0; }
+      p { color: $gray-500; font-size: 0.9rem; margin: 0; }
     }
 
     .filter-tools {
-      display: flex; gap: 12px;
+      display: flex; gap: 10px;
+
       .search-field input {
-        width: 320px; padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 8px;
-        &:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+        padding: 10px 15px; border: 1px solid $gray-200; border-radius: 8px;
+        width: 300px; outline: none; transition: 0.2s;
+        &:focus { border-color: $primary; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
       }
+
+      .btn-primary {
+        background: $primary; color: white; border: none; padding: 0 20px;
+        border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;
+        transition: 0.2s;
+        &:hover { background: darken($primary, 10%); }
+      }
+
       .btn-secondary {
-        background: #f1f5f9; border: none; padding: 0 16px; border-radius: 8px;
-        font-weight: 600; cursor: pointer; color: #475569;
+        background: white; border: 1px solid $gray-200; width: 42px; display: flex; align-items: center; justify-content: center;
+        border-radius: 8px; cursor: pointer; color: $gray-500;
+        &:hover { background: $gray-100; color: $primary; border-color: $primary; }
       }
     }
   }
 
-  .user-list-table {
-    width: 100%; border-collapse: collapse; background: #fff;
-    
-    th {
-      text-align: left; padding: 12px 20px; border-bottom: 2px solid #f1f5f9;
-      color: #64748b; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+  /* TABLE STYLES */
+  .view-content {
+     background: white; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow: hidden;
+     .user-list-table {
+        width: 100%; border-collapse: collapse;
+        thead th { background: $gray-100; padding: 16px 24px; text-align: left; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: $gray-500; }
+        tbody tr { 
+            border-bottom: 1px solid $gray-100; 
+            &:hover { background: #f8fafc; }
+            &.row-inactive { opacity: 0.6; background: #fef2f2; }
+            td { padding: 16px 24px; vertical-align: middle; color: $gray-800; font-size: 0.9rem; }
+        }
+     }
+  }
+  
+  .identity-group { display: flex; flex-direction: column; .full-name { font-weight: 600; } .user-meta { font-size: 0.8rem; color: $gray-500; } }
+  .role-tag { padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; &.QUẢN.TRỊ { background: #e0e7ff; color: #4338ca; } &.CHỦ.NHÀ { background: #dcfce7; color: #15803d; } &.NGƯỜI.THUÊ { background: #fff7ed; color: #c2410c; } }
+  .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; background: #fee2e2; color: #991b1b; &.active { background: #ecfccb; color: #365314; } }
+  
+  .button-group {
+    display: flex; gap: 8px;
+    .btn-small { padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: none; 
+      &.btn-edit { background: #eff6ff; color: $primary; }
+      &.btn-lock { background: #fff7ed; color: $warning; }
+      &.btn-unlock { background: #f0fdf4; color: $success; }
+      &.btn-delete { background: #fef2f2; color: $danger; }
     }
+  }
 
-    td { padding: 16px 20px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+  /* MODAL RESPONSIVE */
+  .modal-backdrop {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5); z-index: 1000; backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px; /* Thêm padding để modal không dính sát mép màn hình đt */
 
-    .identity-group {
-      .full-name { display: block; font-weight: 700; color: #1e293b; font-size: 15px; }
-      .user-meta { font-size: 12px; color: #94a3b8; margin-top: 2px; }
-    }
-
-    .role-tag {
-      font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 4px;
-      &.QUẢN { background: #fee2e2; color: #991b1b; }
-      &.CHỦ { background: #dcfce7; color: #166534; }
-      &.NGƯỜI { background: #eff6ff; color: #1e40af; }
-    }
-
-    .contact-group {
-      display: flex; flex-direction: column;
-      .email { font-size: 14px; color: #1e293b; }
-      .phone { font-size: 12px; color: #64748b; }
-    }
-
-    .status-badge {
-      font-size: 13px; font-weight: 500; color: #ef4444;
-      &.active { color: #22c55e; }
-    }
-
-    .actions-col { text-align: right; }
-    
-    .button-group {
-      display: flex; justify-content: flex-end; gap: 8px;
-      .btn-small {
-        padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 700;
-        cursor: pointer; border: none; transition: 0.2s;
+    .modal-container {
+      background: white; 
+      width: 100%; /* Chiếm full chiều ngang cho phép */
+      max-width: 550px; /* Nhưng không quá 550px */
+      border-radius: 16px; 
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); 
+      overflow: hidden; 
+      animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex; 
+      flex-direction: column;
+      max-height: 90vh; /* Tránh modal cao quá màn hình */
+      
+      .modal-header { 
+        padding: 20px 24px; 
+        border-bottom: 1px solid $gray-200; 
+        display: flex; justify-content: space-between; align-items: center; 
+        background: white;
+        
+        h2 { margin: 0; font-size: 1.25rem; font-weight: 700; color: $gray-800; } 
+        .btn-close-text { background: none; border: none; cursor: pointer; font-weight: 600; color: $gray-500; padding: 5px; &:hover { color: $danger; } } 
       }
-      .btn-edit { background: #f8fafc; color: #475569; &:hover { background: #e2e8f0; } }
-      .btn-lock { background: #fff1f2; color: #e11d48; &:hover { background: #ffe4e6; } }
-      .btn-unlock { background: #f0fdf4; color: #16a34a; &:hover { background: #dcfce7; } }
-      .btn-delete { background: white; color: #94a3b8; &:hover { color: #ef4444; } }
-    }
+      
+      .modal-body {
+        padding: 24px;
+        overflow-y: auto; /* Cho phép cuộn nếu nội dung dài */
 
-    .row-inactive { background-color: #fafafa; td { opacity: 0.8; } }
-  }
+        /* Xử lý 2 ô dính nhau & Responsive */
+        .row-group { 
+          display: flex; 
+          gap: 20px; /* Tăng khoảng cách giữa 2 ô */
+          
+          .field-group { flex: 1; }
 
-  .feedback-box {
-    text-align: center; padding: 100px 0; color: #94a3b8;
-    .loading-spinner {
-      width: 32px; height: 32px; border: 3px solid #f3f3f3; border-top: 3px solid #2563eb;
-      border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 15px;
-    }
-  }
-}
+          /* Khi màn hình nhỏ hơn 600px -> Chuyển thành cột dọc */
+          @media (max-width: 600px) {
+            flex-direction: column;
+            gap: 0; /* Reset gap vì field-group đã có margin-bottom */
+          }
+        }
 
-// ... (Giữ các style cũ cho Table và Header) ...
+        .field-group {
+          margin-bottom: 20px; /* Tăng khoảng cách dưới */
+          
+          label { 
+            display: block; margin-bottom: 8px; 
+            font-weight: 600; font-size: 0.9rem; color: $gray-800;
+            .req { color: $danger; margin-left: 3px; } 
+          }
+          
+          input, select { 
+            width: 100%; 
+            padding: 12px; /* Input cao hơn cho dễ bấm trên mobile */
+            border: 1px solid $gray-200; 
+            border-radius: 8px; 
+            outline: none; 
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            box-sizing: border-box; /* Quan trọng để padding không làm vỡ layout */
+            
+            &:focus { border-color: $primary; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+          }
+          
+          .hint { font-size: 0.8rem; color: $gray-500; margin-top: 6px; font-style: italic; }
+        }
+      }
 
-// --- MODAL STYLES ---
-.modal-backdrop {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(15, 23, 42, 0.5); // Nền tối mờ
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  backdrop-filter: blur(4px);
-
-  .modal-container {
-    background: white;
-    width: 100%;
-    max-width: 500px;
-    border-radius: 12px;
-    padding: 30px;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
-      h2 { font-size: 18px; font-weight: 800; color: #1e293b; margin: 0; }
-      .btn-close-text { background: none; border: none; color: #94a3b8; font-weight: 600; cursor: pointer; }
-    }
-
-    .modal-body {
-      .field-group {
-        margin-bottom: 20px;
-        label { display: block; font-size: 13px; font-weight: 700; color: #64748b; margin-bottom: 8px; }
-        input, select {
-          width: 100%;
-          padding: 10px 14px;
-          border: 1px solid #e2e8f0;
-          border-radius: 8px;
-          font-family: inherit;
-          &:focus { outline: none; border-color: #2563eb; }
+      .modal-footer {
+        padding: 20px 24px; 
+        background: $gray-100; 
+        display: flex; justify-content: flex-end; gap: 12px;
+        border-top: 1px solid $gray-200;
+        
+        button { 
+          padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; font-size: 0.95rem;
+          &.btn-cancel { background: white; border: 1px solid $gray-200; color: $gray-500; &:hover { background: #f8fafc; } } 
+          &.btn-save { background: $primary; color: white; box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2); &:hover { background: darken($primary, 5%); } } 
         }
       }
     }
-
-    .modal-footer {
-      display: flex;
-      justify-content: flex-end;
-      gap: 12px;
-      margin-top: 30px;
-      button { padding: 10px 20px; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; }
-      .btn-cancel { background: #f1f5f9; color: #475569; }
-      .btn-save { background: #2563eb; color: white; }
-    }
   }
 }
+@keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-@keyframes spin { 100% { transform: rotate(360deg); } }
+.contact-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px; 
+    
+    .email { 
+      font-weight: 500; 
+      color: $gray-800;
+      word-break: break-all; 
+    }
+    .phone { 
+      font-size: 0.85rem; 
+      color: $gray-500; 
+    }
+  }

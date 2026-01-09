@@ -1,9 +1,11 @@
 package com.techroom.authservice.controller;
 
+import com.techroom.authservice.dto.UserCreateDto; // Import DTO mới
 import com.techroom.authservice.dto.UserDto;
 import com.techroom.authservice.dto.UserUpdateDto;
 import com.techroom.authservice.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus; // <--- ĐÃ THÊM IMPORT NÀY ĐỂ FIX LỖI
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +34,6 @@ public class UserController {
     }
 
     // 3. Cập nhật / Khóa tài khoản (Chỉ Admin)
-    // PUT http://localhost:8081/api/users/2
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserDto> updateUser(@PathVariable Integer id, @RequestBody UserUpdateDto request) {
@@ -40,11 +41,18 @@ public class UserController {
     }
 
     // 4. Xóa tài khoản (Chỉ Admin)
-    // DELETE http://localhost:8081/api/users/2
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteUser(@PathVariable Integer id) {
         userService.deleteUser(id);
         return ResponseEntity.ok("User deleted successfully");
+    }
+
+    // 5. THÊM MỚI NGƯỜI DÙNG (ADMIN TẠO, CÓ THỂ CHỌN ROLE)
+    @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<UserDto> createUser(@RequestBody UserCreateDto request) {
+        // Sử dụng HttpStatus.CREATED (201) cho đúng chuẩn REST
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(request));
     }
 }

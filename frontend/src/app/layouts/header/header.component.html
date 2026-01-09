@@ -1,0 +1,109 @@
+<nav class="navbar">
+  <div class="container">
+    <!-- Logo -->
+    <a class="logo" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+      <span class="tech">TECH</span><span class="room">ROOM</span>
+    </a>
+
+    <!-- Auth Section -->
+    <div class="auth-section">
+      <!-- Not Logged In -->
+      <ng-container *ngIf="!authService.isAuthenticated()">
+        <a routerLink="/login" class="btn-text">Đăng nhập</a>
+        <a routerLink="/register" class="btn-primary">Đăng ký</a>
+      </ng-container>
+
+      <!-- Logged In -->
+      <ng-container *ngIf="authService.isAuthenticated()">
+        <div class="user-dropdown">
+          <button class="user-trigger" type="button">
+            <div class="avatar-circle">{{ getFullName().charAt(0).toUpperCase() }}</div>
+            <span class="user-name">{{ getFullName() }}</span>
+            <svg class="chevron" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M4.427 6.427l3.396 3.396a.25.25 0 00.354 0l3.396-3.396A.25.25 0 0011.396 6H4.604a.25.25 0 00-.177.427z"/>
+            </svg>
+          </button>
+
+          <ul class="dropdown-menu">
+            <!-- TENANT Menu -->
+            <ng-container *ngIf="authService.getRole() === 'TENANT'">
+              <li><a class="dropdown-item" routerLink="/landlord-request">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M8.186 1.113a.5.5 0 00-.372 0L1.846 3.5l2.404.961L10.404 2l-2.218-.887zm3.564 1.426L5.596 5 8 5.961 14.154 3.5l-2.404-.961zm3.25 1.7l-6.5 2.6v7.922l6.5-2.6V4.24zM7.5 14.762V6.838L1 4.239v7.923l6.5 2.6zM7.443.184a1.5 1.5 0 011.114 0l7.129 2.852A.5.5 0 0116 3.5v8.662a1 1 0 01-.629.928l-7.185 2.874a.5.5 0 01-.372 0L.629 13.09a1 1 0 01-.629-.928V3.5a.5.5 0 01.314-.464L7.443.184z"/>
+                </svg>
+                Đăng ký chủ trọ
+              </a></li>
+              <li><a class="dropdown-item" routerLink="/tenant/my-bookings">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M14 2H2a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1V3a1 1 0 00-1-1zM2 0a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V2a2 2 0 00-2-2H2z"/>
+                  <path d="M2.5 4a.5.5 0 01.5-.5h10a.5.5 0 01.5.5v1a.5.5 0 01-.5.5H3a.5.5 0 01-.5-.5V4zm0 3a.5.5 0 01.5-.5h4a.5.5 0 01.5.5v5a.5.5 0 01-.5.5H3a.5.5 0 01-.5-.5V7zm6 0a.5.5 0 01.5-.5h4a.5.5 0 01.5.5v5a.5.5 0 01-.5.5H9a.5.5 0 01-.5-.5V7z"/>
+                </svg>
+                Hợp đồng đã thuê
+              </a></li>
+              <li><a class="dropdown-item" routerLink="/tenant/tenant-invoices">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M4 0a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V2a2 2 0 00-2-2H4zm0 1h8a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V2a1 1 0 011-1z"/>
+                  <path d="M4.603 4.213c.5-.1 1.102-.181 1.763-.249.662-.066 1.334-.1 2.002-.107.668-.007 1.335.012 1.993.062.66.05 1.255.136 1.77.275.125.033.242.067.352.104a2.05 2.05 0 01.3.121c.043.021.083.043.12.066.035.023.068.047.098.073.03.027.057.055.08.086.024.03.046.062.064.096.018.034.033.069.044.106.012.037.021.075.026.114.005.04.006.08.004.12-.003.04-.009.08-.019.119-.01.038-.024.075-.042.11-.017.034-.038.067-.062.098-.024.03-.051.058-.08.084a1.02 1.02 0 01-.095.07 1.24 1.24 0 01-.112.063 1.52 1.52 0 01-.126.056 2.52 2.52 0 01-.14.055 4.51 4.51 0 01-.309.095c-.521.137-1.128.223-1.799.273-.67.05-1.344.07-2.002.062-.658-.007-1.304-.043-1.924-.109-.619-.066-1.194-.15-1.702-.249zm5.018 5.575c-.21.012-.423.016-.638.011-.214-.005-.425-.02-.633-.047-.207-.026-.41-.064-.606-.114a4.59 4.59 0 01-.575-.174 3.35 3.35 0 01-.515-.246 2.42 2.42 0 01-.428-.313 1.74 1.74 0 01-.312-.361 1.26 1.26 0 01-.178-.38c-.043-.126-.065-.258-.065-.393 0-.135.022-.267.065-.393.043-.125.103-.244.178-.355.075-.11.168-.21.277-.298.109-.087.23-.162.362-.224.132-.061.274-.111.424-.147.15-.036.307-.064.469-.083.162-.019.328-.029.497-.03.169-.002.339.005.51.02.171.015.341.04.51.074.169.035.336.08.5.135.164.055.324.121.48.197.156.076.307.163.451.26.145.098.282.207.41.326.128.12.245.252.35.394.105.143.194.298.266.464.072.165.126.343.16.53.035.188.05.386.046.593a2.06 2.06 0 01-.126.596 1.75 1.75 0 01-.281.504 1.73 1.73 0 01-.415.373 2.1 2.1 0 01-.522.252 3.02 3.02 0 01-.594.122z"/>
+                </svg>
+                Hóa đơn của tôi
+              </a></li>
+              <li class="divider"></li>
+            </ng-container>
+
+            <!-- LANDLORD Menu -->
+            <ng-container *ngIf="authService.getRole() === 'LANDLORD'">
+              <li><a class="dropdown-item" routerLink="/landlord/contract-management">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M9.5 0a.5.5 0 01.5.5.5.5 0 01-.5.5h-3a.5.5 0 010-1h3zM6 2.5V2h4v.5a1 1 0 01-1 1H7a1 1 0 01-1-1zm9 0a.5.5 0 00-1 0v12.5a.5.5 0 00.5.5h.5a.5.5 0 000-1H13V2.5zM1 2.5a.5.5 0 011 0V15h2.5a.5.5 0 010 1H1.5a.5.5 0 01-.5-.5V2.5z"/>
+                </svg>
+                Duyệt đặt phòng
+              </a></li>
+              <li><a class="dropdown-item" routerLink="/landlord/manage-rooms">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M6.5 14.5v-3.505c0-.245.25-.495.5-.495h2c.25 0 .5.25.5.5v3.5a.5.5 0 00.5.5h4a.5.5 0 00.5-.5v-7a.5.5 0 00-.146-.354L13 5.793V2.5a.5.5 0 00-.5-.5h-1a.5.5 0 00-.5.5v1.293L8.354 1.146a.5.5 0 00-.708 0l-6 6A.5.5 0 001.5 7.5v7a.5.5 0 00.5.5h4a.5.5 0 00.5-.5z"/>
+                </svg>
+                Quản lý phòng
+              </a></li>
+              <li><a class="dropdown-item" routerLink="/landlord/manage-buildings">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M14.5 3a.5.5 0 01.5.5v9a.5.5 0 01-.5.5h-13a.5.5 0 01-.5-.5v-9a.5.5 0 01.5-.5h13zm-13-1A1.5 1.5 0 000 3.5v9A1.5 1.5 0 001.5 14h13a1.5 1.5 0 001.5-1.5v-9A1.5 1.5 0 0014.5 2h-13z"/>
+                  <path d="M3 5.5a.5.5 0 01.5-.5h9a.5.5 0 010 1h-9a.5.5 0 01-.5-.5zM3 8a.5.5 0 01.5-.5h9a.5.5 0 010 1h-9A.5.5 0 013 8zm0 2.5a.5.5 0 01.5-.5h6a.5.5 0 010 1h-6a.5.5 0 01-.5-.5z"/>
+                </svg>
+                Tòa nhà của tôi
+              </a></li>
+              <li><a class="dropdown-item" routerLink="/landlord/landlord-invoices">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M5 10.5a.5.5 0 01.5-.5h2a.5.5 0 010 1h-2a.5.5 0 01-.5-.5zm0-2a.5.5 0 01.5-.5h5a.5.5 0 010 1h-5a.5.5 0 01-.5-.5zm0-2a.5.5 0 01.5-.5h5a.5.5 0 010 1h-5a.5.5 0 01-.5-.5zm0-2a.5.5 0 01.5-.5h5a.5.5 0 010 1h-5a.5.5 0 01-.5-.5z"/>
+                  <path d="M3 0h10a2 2 0 012 2v12a2 2 0 01-2 2H3a2 2 0 01-2-2v-1h1v1a1 1 0 001 1h10a1 1 0 001-1V2a1 1 0 00-1-1H3a1 1 0 00-1 1v1H1V2a2 2 0 012-2z"/>
+                  <path d="M1 5v-.5a.5.5 0 011 0V5h.5a.5.5 0 010 1h-2a.5.5 0 010-1H1zm0 3v-.5a.5.5 0 011 0V8h.5a.5.5 0 010 1h-2a.5.5 0 010-1H1zm0 3v-.5a.5.5 0 011 0v.5h.5a.5.5 0 010 1h-2a.5.5 0 010-1H1z"/>
+                </svg>
+                Quản lý Hóa đơn
+              </a></li>
+              <li class="divider"></li>
+            </ng-container>
+
+            <!-- ADMIN Menu -->
+            <ng-container *ngIf="authService.getRole() === 'ADMIN'">
+              <li><a class="dropdown-item" routerLink="/admin/statistics">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M0 0h1v15h15v1H0V0zm10 3.5a.5.5 0 01.5-.5h4a.5.5 0 01.5.5v4a.5.5 0 01-1 0V4.9l-3.613 4.417a.5.5 0 01-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 01-.808-.588l4-5.5a.5.5 0 01.758-.06l2.609 2.61L13.445 4H10.5a.5.5 0 01-.5-.5z"/>
+                </svg>
+                Dashboard
+              </a></li>
+              <li class="divider"></li>
+            </ng-container>
+
+            <!-- Logout -->
+            <li><a class="dropdown-item logout" (click)="onLogout()">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 12.5a.5.5 0 01-.5.5h-8a.5.5 0 01-.5-.5v-9a.5.5 0 01.5-.5h8a.5.5 0 01.5.5v2a.5.5 0 001 0v-2A1.5 1.5 0 009.5 2h-8A1.5 1.5 0 000 3.5v9A1.5 1.5 0 001.5 14h8a1.5 1.5 0 001.5-1.5v-2a.5.5 0 00-1 0v2z"/>
+                <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 000-.708l-3-3a.5.5 0 00-.708.708L14.293 7.5H5.5a.5.5 0 000 1h8.793l-2.147 2.146a.5.5 0 00.708.708l3-3z"/>
+              </svg>
+              Đăng xuất
+            </a></li>
+          </ul>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</nav>

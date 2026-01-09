@@ -1,9 +1,13 @@
 package com.techroom.authservice.security;
 
+import com.techroom.authservice.model.User;
+import com.techroom.authservice.model.UserStatus;
+import com.techroom.authservice.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,15 +20,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 @Component
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider tokenProvider;
     private final UserDetailsService userDetailsService;
-
-    public JwtAuthenticationFilter(JwtTokenProvider tokenProvider, UserDetailsService userDetailsService) {
-        this.tokenProvider = tokenProvider;
-        this.userDetailsService = userDetailsService;
-    }
+    private final UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -36,6 +37,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // Chỉ xử lý nếu token thực sự có nội dung và hợp lệ
             if (StringUtils.hasText(token) && tokenProvider.validateToken(token)) {
                 String username = tokenProvider.getUsername(token);
+
+                // ✅ KIỂM TRA TÀI KHOẢN CÓ BỊ BANNED KHÔNG
+                User user = userRepository.findByUsername(username).orElse(null);
+                if (user != null && user.getStatus() == UserStatus.BANNED) {
+                    // Trả về 403 Forbidden với message rõ ràng
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.setContentType("application/json;charset=UTF-8");
+                    response.getWriter().write("{\"message\": \"Tài khoản đã bị khóa\"}");
+                    return; // Dừng filter chain, không cho request đi tiếp
+                }
+
+                // Load user details và set authentication
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
@@ -46,7 +59,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         } catch (Exception e) {
             // Nếu token lỗi, chỉ đơn giản là không set Authentication vào Context
-            // Không ném ngoại lệ để request có thể đi tiếp đến các API permitAll()
             logger.error("Could not set user authentication in security context", e);
         }
 

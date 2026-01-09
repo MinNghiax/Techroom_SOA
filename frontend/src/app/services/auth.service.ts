@@ -1,57 +1,100 @@
-
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 
-@Injectable({ providedIn: 'root' })
-export class AuthService {
-  private authUrl = `${environment.apiBaseUrl}/auth`;
-
-  constructor(private http: HttpClient) { }
-
-  register(userData: any): Observable<any> {
-    return this.http.post<any>(`${this.authUrl}/register`, userData);
-  }
-
-  login(credentials: any) {
-  return this.http.post<any>(`${this.authUrl}/login`, credentials).pipe(
-    tap(res => {
-      // Lưu các thông tin cũ của bạn
-      localStorage.setItem('accessToken', res.accessToken);
-      localStorage.setItem('username', res.username);
-      localStorage.setItem('userId', res.userId);
-
-      // BỔ SUNG DÒNG NÀY: Lưu họ tên thật vào localStorage
-      // res.fullName phải khớp chính xác với tên trường Backend trả về
-      if (res.fullName) {
-        localStorage.setItem('fullName', res.fullName);
-      } else {
-        console.warn('Backend không trả về trường fullName!');
-      }
-
-      // Đảm bảo luôn lưu role là chuỗi (ADMIN, LANDLORD, TENANT)
-      let roleName = res.role;
-      if (typeof roleName === 'number') {
-        roleName = roleName === 0 ? 'ADMIN' : (roleName === 1 ? 'LANDLORD' : 'TENANT');
-      } else if (typeof roleName === 'string') {
-        // Nếu backend trả về chuỗi thường, chuyển về in hoa
-        roleName = roleName.toUpperCase();
-      }
-      localStorage.setItem('userRole', roleName);
-    })
-  );
+export interface LoginRequest {
+  username: string;
+  password: string;
 }
 
+export interface RegisterRequest {
+  username: string;
+  password: string;
+  fullName: string;
+  email: string;
+  phone: string;
+}
+
+export interface AuthResponse {
+  accessToken: string;
+  username: string;
+  fullName?: string;
+  role: any;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthService {
+  private apiUrl = `${environment.apiBaseUrl}/auth`;
+
+  constructor(
+    private http: HttpClient,
+    private router: Router
+  ) {}
+
+  /**
+   * Đăng ký tài khoản mới
+   */
+  register(data: RegisterRequest): Observable<any> {
+    return this.http.post(`${this.apiUrl}/register`, data);
+  }
+
+  /**
+   * Đăng nhập
+   */
+  login(data: LoginRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, data);
+  }
+
+  /**
+   * Đăng xuất
+   */
+  logout(): void {
+    const token = localStorage.getItem('accessToken');
+    
+    // Gọi API logout (optional - vì JWT stateless)
+    if (token) {
+      const headers = new HttpHeaders({
+        'Authorization': `Bearer ${token}`
+      });
+      
+      this.http.post(`${this.apiUrl}/logout`, {}, { headers }).subscribe({
+        next: () => console.log('Logged out successfully'),
+        error: () => console.log('Logout API failed, clearing local data anyway')
+      });
+    }
+
+    // Xóa tất cả thông tin đăng nhập
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('username');
+    localStorage.removeItem('fullName');
+
+    // Chuyển về trang login
+    this.router.navigate(['/login']);
+  }
+
+  /**
+   * Kiểm tra user đã đăng nhập chưa
+   */
   isAuthenticated(): boolean {
     return !!localStorage.getItem('accessToken');
   }
 
+  /**
+   * Lấy role của user hiện tại
+   */
   getRole(): string | null {
-    return localStorage.getItem('userRole'); // Ví dụ: 'ADMIN', 'LANDLORD', 'TENANT'
+    return localStorage.getItem('userRole');
   }
 
-  logout() {
-    localStorage.clear();
+  /**
+   * Lấy username của user hiện tại
+   */
+  getUsername(): string | null {
+    return localStorage.getItem('username');
   }
 }

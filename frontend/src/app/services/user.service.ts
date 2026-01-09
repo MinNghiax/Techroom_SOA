@@ -1,34 +1,36 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { User, UserUpdate } from '../models/user.model';
+import { environment } from '../../environments/environment';
+import { User, UserUpdate, UserCreate } from '../models/user.model'; // Import thêm UserCreate
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class UserService {
-  // Đi qua Gateway để tận dụng Load Balancer và Auth Filter
-  private apiUrl = 'http://localhost:8080/api/users';
+  private apiUrl = `${environment.apiBaseUrl}/users`;
 
   constructor(private http: HttpClient) {}
 
-  // 1. Lấy danh sách (GET /api/users)
   getAllUsers(): Observable<User[]> {
-    return this.http.get<User[]>(this.apiUrl);
+    const token = localStorage.getItem('accessToken');
+    const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+    return this.http.get<User[]>(this.apiUrl, { headers });
   }
 
-  // 2. Xem chi tiết (GET /api/users/{id})
-  getUserById(id: number): Observable<User> {
-    return this.http.get<User>(`${this.apiUrl}/${id}`);
+  updateUser(id: number, data: UserUpdate): Observable<User> {
+    const token = localStorage.getItem('accessToken');
+    const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+    return this.http.put<User>(`${this.apiUrl}/${id}`, data, { headers });
   }
 
-  // 3. Cập nhật / Khóa (PUT /api/users/{id})
-  updateUser(id: number, userData: UserUpdate): Observable<User> {
-    return this.http.put<User>(`${this.apiUrl}/${id}`, userData);
+  deleteUser(id: number): Observable<any> {
+    const token = localStorage.getItem('accessToken');
+    const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+    return this.http.delete(`${this.apiUrl}/${id}`, { headers, responseType: 'text' });
   }
 
-  // 4. Xóa (DELETE /api/users/{id})
-  deleteUser(id: number): Observable<string> {
-    return this.http.delete(`${this.apiUrl}/${id}`, { responseType: 'text' });
+createUser(userData: any): Observable<User> {
+    const token = localStorage.getItem('accessToken');
+    const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+    return this.http.post<User>(this.apiUrl, userData, { headers });
   }
 }
