@@ -88,6 +88,101 @@
   }
 }
 
+// ... (Giữ nguyên phần .container và .hero của bạn) ...
+
+// Search Section (Bổ sung mới để thay thế cho .stats cũ)
+.search-section {
+  position: relative;
+  z-index: 10;
+  margin-top: -50px; // Hiệu ứng đè lên Hero
+
+  .search-card {
+    background: #fff;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  }
+
+  .search-form {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr) 180px;
+    gap: 20px;
+    align-items: flex-end;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .search-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    label {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: #2d3436;
+    }
+
+    select {
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #dfe6e9;
+      background-color: #f8f9fa;
+      color: #636e72;
+      outline: none;
+      &:focus { border-color: #0984e3; }
+    }
+  }
+
+  .btn-submit-search {
+    background: #0984e3;
+    color: #fff;
+    border: none;
+    padding: 14px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    &:hover { background: #074b83; transform: translateY(-2px); }
+  }
+}
+
+.search-form {
+  display: grid;
+  // Chia thành 5 cột bằng nhau, cột cuối (nút bấm) có thể rộng hơn một chút nếu cần
+  grid-template-columns: repeat(4, 1fr) 140px; 
+  gap: 15px;
+  align-items: flex-end;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr); // Màn hình tablet hiện 2 hàng
+    .btn-submit-search { grid-column: span 2; }
+  }
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr; // Màn hình điện thoại hiện 1 hàng dọc
+    .btn-submit-search { grid-column: span 1; }
+  }
+}
+
+.search-group {
+  select {
+    width: 100%;
+    height: 45px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 0 10px;
+    background-color: #fff;
+    &:disabled {
+      background-color: #f5f5f5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+// ... (Giữ nguyên .features, .featured-rooms, .room-grid từ mã cũ của bạn) ...
 // Features Section
 .features {
   padding: 100px 0;
