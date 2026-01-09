@@ -6,7 +6,6 @@
         <p>Techroom giúp bạn tìm kiếm, đặt phòng và quản lý hợp đồng thuê nhà chỉ trong vài cú click.</p>
         <div class="hero-actions">
           <button class="btn-main" routerLink="/rooms">Khám phá ngay</button>
-          <button class="btn-sub" routerLink="/register">Trở thành chủ nhà</button>
           <button class="btn-sub" routerLink="/landlord-request">Đăng ký chủ trọ</button>
         </div>
       </div>
@@ -17,33 +16,44 @@
     </div>
   </section>
 
-  <section class="stats container">
-    <div class="stat-item"><strong>500+</strong> <span>Phòng trống</span></div>
-    <div class="stat-item"><strong>100+</strong> <span>Tòa nhà</span></div>
-    <div class="stat-item"><strong>1000+</strong> <span>Khách thuê</span></div>
-  </section>
+  <section class="search-section container">
+    <div class="search-card">
+      <form class="search-form" (ngSubmit)="onSearch()">
+        
+        <div class="search-group">
+          <label><i class="fa-solid fa-map-location-dot"></i> Khu vực</label>
+          <select name="location" [(ngModel)]="searchCriteria.location">
+            <option value="">Tất cả khu vực</option>
+            <option *ngFor="let loc of locations" [value]="loc">{{ loc }}</option>
+          </select>
+        </div>
 
-  <section class="features container">
-    <div class="section-title">
-      <h2>Tại sao chọn Techroom?</h2>
-      <p>Trải nghiệm tìm trọ hoàn toàn mới với công nghệ đột phá</p>
-    </div>
-    <div class="feature-grid">
-      <div class="feature-card">
-        <div class="icon">🔍</div>
-        <h3>Tìm kiếm thông minh</h3>
-        <p>Lọc theo giá, vị trí và tiện ích cực kỳ nhanh chóng qua hệ thống tối ưu.</p>
-      </div>
-      <div class="feature-card">
-        <div class="icon">📜</div>
-        <h3>Hợp đồng trực tuyến</h3>
-        <p>Mọi thỏa thuận đều được số hóa, minh bạch và an toàn tuyệt đối.</p>
-      </div>
-      <div class="feature-card">
-        <div class="icon">⭐</div>
-        <h3>Đánh giá thật</h3>
-        <p>Cộng đồng Techroom đánh giá giúp bạn chọn được căn phòng ưng ý nhất.</p>
-      </div>
+        <div class="search-group">
+          <label><i class="fa-solid fa-tag"></i> Mức giá</label>
+          <select name="price" [(ngModel)]="searchCriteria.priceRange">
+            <option value="">Tất cả giá</option>
+            <option value="0-2000000">Dưới 2 triệu</option>
+            <option value="2000000-5000000">2 - 5 triệu</option>
+            <option value="5000000-10000000">5 - 10 triệu</option>
+            <option value="10000000-999999999">Trên 10 triệu</option>
+          </select>
+        </div>
+
+        <div class="search-group">
+          <label><i class="fa-solid fa-expand"></i> Diện tích</label>
+          <select name="area" [(ngModel)]="searchCriteria.areaRange">
+            <option value="">Tất cả diện tích</option>
+            <option value="0-20">Dưới 20 m²</option>
+            <option value="20-35">20 - 35 m²</option>
+            <option value="35-50">35 - 50 m²</option>
+            <option value="50-500">Trên 50 m²</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn-submit-search">
+          <i class="fa-solid fa-magnifying-glass"></i> Tìm kiếm
+        </button>
+      </form>
     </div>
   </section>
 
