@@ -11,6 +11,7 @@ import com.techroom.authservice.security.JwtTokenProvider;
 import com.techroom.authservice.service.AuthService;
 import com.techroom.authservice.service.RefreshTokenService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -24,12 +25,21 @@ public class AuthController {
     private final RefreshTokenService refreshTokenService;
     private final JwtTokenProvider jwtTokenProvider;
 
-    // API Đăng nhập
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest loginRequest) {
-        // Gọi service trả về AuthResponse chuẩn
-        AuthResponse response = authService.login(loginRequest);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+        try {
+            AuthResponse response = authService.login(loginRequest);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            if ("ACCOUNT_LOCKED".equals(e.getMessage())) {
+                // Trả về 403 Forbidden khi tài khoản bị khóa
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(java.util.Map.of("message", "Tài khoản của bạn đã bị khóa bởi quản trị viên."));
+            }
+            // Trả về 401 Unauthorized cho các lỗi sai thông tin khác
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(java.util.Map.of("message", e.getMessage()));
+        }
     }
 
     // API Đăng ký

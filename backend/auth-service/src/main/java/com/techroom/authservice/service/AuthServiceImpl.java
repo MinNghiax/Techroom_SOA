@@ -29,38 +29,45 @@ public class AuthServiceImpl implements AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenService refreshTokenService;
 
-        @Override
-        public AuthResponse login(LoginRequest loginRequest) {
-        // 1. Xác thực username/password
+    @Override
+    public AuthResponse login(LoginRequest loginRequest) {
+        // 1. Xác thực username và password qua AuthenticationManager
+        // Nếu sai tên đăng nhập hoặc mật khẩu, Spring Security sẽ ném AuthenticationException tại đây
         Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(
-                loginRequest.getUsername(),
-                loginRequest.getPassword()
-            )
+                new UsernamePasswordAuthenticationToken(
+                        loginRequest.getUsername(),
+                        loginRequest.getPassword()
+                )
         );
 
-        // 2. Nếu xác thực thành công, lưu vào context
+        // 2. Tìm thông tin người dùng từ database
+        User user = userRepository.findByUsername(loginRequest.getUsername())
+                .orElseThrow(() -> new RuntimeException("Tài khoản hoặc mật khẩu không chính xác"));
+
+        // 3. KIỂM TRA TRẠNG THÁI TÀI KHOẢN (Bảo mật lớp 2)
+        // Nếu mật khẩu đúng nhưng tài khoản bị BANNED, ném lỗi cụ thể để Frontend hiển thị thông báo khóa
+        if (user.getStatus() != UserStatus.ACTIVE) {
+            throw new RuntimeException("Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.");
+        }
+
+        // 4. Lưu thông tin xác thực vào SecurityContext
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // 3. Lấy thông tin user
-        User user = userRepository.findByUsername(loginRequest.getUsername())
-            .orElseThrow(() -> new RuntimeException("User not found"));
-
-        // 4. Tạo Access Token (JWT) với claim role là chuỗi
+        // 5. Tạo Access Token (JWT)
         String token = jwtTokenProvider.generateToken(user);
 
-        // 5. Tạo Refresh Token thật và lưu xuống DB
+        // 6. Tạo Refresh Token và lưu vào cơ sở dữ liệu
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getUsername());
 
-        // 6. Trả về Response chứa cả 2 loại token
+        // 7. Trả về đối tượng AuthResponse chứa đầy đủ thông tin cần thiết
         return AuthResponse.builder()
-            .userId(user.getId())
-            .accessToken(token)
-            .refreshToken(refreshToken.getToken())
-            .username(user.getUsername())
-            .role(user.getRole().name())
-            .build();
-        }
+                .userId(user.getId())
+                .accessToken(token)
+                .refreshToken(refreshToken.getToken())
+                .username(user.getUsername())
+                .role(user.getRole().name())
+                .build();
+    }
 
     @Override
     @Transactional

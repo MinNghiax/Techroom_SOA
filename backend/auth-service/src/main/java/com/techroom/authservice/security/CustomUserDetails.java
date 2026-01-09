@@ -1,6 +1,7 @@
     package com.techroom.authservice.security;
 
     import com.techroom.authservice.model.User;
+    import com.techroom.authservice.model.UserStatus;
     import lombok.AllArgsConstructor;
     import lombok.Data;
     import org.springframework.security.core.GrantedAuthority;
@@ -39,7 +40,8 @@
 
         @Override
         public boolean isAccountNonLocked() {
-            return true; // Có thể check user.getStatus() != BANNED nếu muốn chặt chẽ hơn
+            // Trả về false nếu status là BANNED
+            return user.getStatus() != UserStatus.BANNED;
         }
 
         @Override
@@ -49,6 +51,8 @@
 
         @Override
         public boolean isEnabled() {
-            return true; // Có thể check user.getStatus() == ACTIVE
+            // Tài khoản chỉ khả dụng khi status là ACTIVE
+            return user.getStatus() == UserStatus.ACTIVE;
         }
+
     }

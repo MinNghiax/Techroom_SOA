@@ -58,7 +58,7 @@ export class LoginComponent {
         
         // Xử lý các loại lỗi khác nhau
         if (err.status === 401) {
-          this.errorMessage = 'Tên đăng nhập hoặc mật khẩu không chính xác!';
+          this.errorMessage = 'Tên đăng nhập hoặc mật khẩu không chính xác hoặc đã bị khóa!';
         } else if (err.status === 403) {
           this.errorMessage = 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.';
         } else if (err.status === 0) {
