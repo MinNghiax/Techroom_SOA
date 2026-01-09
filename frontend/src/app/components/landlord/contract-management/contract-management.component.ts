@@ -28,15 +28,30 @@ export class ContractManagementComponent implements OnInit {
       status: 'AVAILABLE', description: '', amenityIds: [], imageUrls: []
     };
     
-  ngOnInit(): void {
-    // Giả lập role nếu chưa có để debug
-    if (!localStorage.getItem('role')) {
-      localStorage.setItem('role', 'LANDLORD');
-      localStorage.setItem('userId', '8');
-    }
-    this.userRole = localStorage.getItem('role') || '';
-    this.loadContracts();
+  // contract-management.component.ts
+
+ngOnInit(): void {
+  // 1. Kiểm tra/Thiết lập Role
+  if (!localStorage.getItem('role')) {
+    localStorage.setItem('role', 'LANDLORD');
+    localStorage.setItem('userId', '8');
   }
+  this.userRole = localStorage.getItem('role') || '';
+
+  // 2. QUAN TRỌNG: Tải phòng trước, sau đó mới tải hợp đồng
+  this.isLoading = true;
+  this.roomService.getRoomsByLandlord().subscribe({
+    next: (roomData) => {
+      this.rooms = roomData;
+      console.log('Đã tải danh sách phòng:', this.rooms); // Debug xem có buildingName không
+      this.loadContracts(); // Chỉ gọi sau khi đã có rooms
+    },
+    error: (err) => {
+      console.error('Lỗi tải phòng:', err);
+      this.loadContracts(); // Vẫn tải hợp đồng kể cả khi lỗi phòng
+    }
+  });
+}
 
   loadRooms() {
     this.isLoading = true;
@@ -138,10 +153,25 @@ export class ContractManagementComponent implements OnInit {
     }
   }
 
-  viewDetail(id: number) {
-    this.selectedContract = this.contracts.find(c => c.id === id);
+  // contract-management.component.ts
+
+viewDetail(id: number) {
+  const contract = this.contracts.find(c => c.id === id);
+  if (contract) {
+    const roomInfo = this.rooms.find(r => r.id === contract.roomId);
+    
+    console.log('Contract:', contract);
+    console.log('Room tương ứng tìm được:', roomInfo);
+
+    this.selectedContract = {
+      ...contract,
+      // Đảm bảo truy cập đúng tên trường từ RoomResponse
+      roomName: roomInfo ? roomInfo.name : 'Không xác định',
+      buildingName: roomInfo ? roomInfo.buildingName : 'Không xác định'
+    };
     this.showDetailModal = true;
   }
+}
 
   closeDetailModal() {
     this.showDetailModal = false;

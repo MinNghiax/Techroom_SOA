@@ -60,6 +60,20 @@
     </div>
 
     <div class="modal-body" *ngIf="selectedContract" >
+      <div class="room-highlight-box" style="background: #f0f7ff; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 20px; border-left: 5px solid #007bff;">
+        <div class="info-group">
+          <label style="font-weight: bold; color: #555;">Tòa nhà:</label>
+          <p style="font-size: 1.1em; margin: 5px 0; color: #007bff; font-weight: 600;">
+            {{ selectedContract.buildingName || 'Đang tải...' }}
+          </p>
+        </div>
+        <div class="info-group">
+          <label style="font-weight: bold; color: #555;">Phòng:</label>
+          <p style="font-size: 1.1em; margin: 5px 0; color: #007bff; font-weight: 600;">
+            {{ selectedContract.roomName || 'Đang tải...' }}
+          </p>
+        </div>
+      </div>
       <div class="info-grid" >
         <div class="info-group">
           <label>Khách thuê:</label>
