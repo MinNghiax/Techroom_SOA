@@ -13,8 +13,13 @@ public class Invoice {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "contract_id")
     private Long contractId;
+
+    @Column(name = "tenant_id")
     private Long tenantId;
+
+    @Column(name = "landlord_id")
     private Long landlordId;
 
     private BigDecimal amount;

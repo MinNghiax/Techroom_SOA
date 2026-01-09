@@ -43,18 +43,31 @@ public class BookingController {
     public ApiResponse<?> create(
             @RequestHeader(value = "X-User-Id", required = false) Integer tenantId,
             @RequestHeader(value = "X-Role", required = false) String role,
+            @RequestHeader(value = "Authorization", required = false) String authorization,
             @RequestBody BookingDTO dto
     ) {
-        // Kiểm tra thủ công để debug dễ hơn
-        if (tenantId == null || role == null) {
-            return new ApiResponse<>(false, "Thiếu thông tin xác thực (X-User-Id hoặc X-Role)", null);
+        System.out.println("==== [BOOKING API] ====");
+        System.out.println("Authorization: " + authorization);
+        System.out.println("X-User-Id: " + tenantId);
+        System.out.println("X-Role: " + role);
+        System.out.println("BookingDTO: " + dto);
+        ApiResponse<?> response;
+        try {
+            // Kiểm tra thủ công để debug dễ hơn
+            if (tenantId == null || role == null) {
+                response = new ApiResponse<>(false, "Thiếu thông tin xác thực (X-User-Id hoặc X-Role)", null);
+            } else if (!"TENANT".equals(role)) {
+                response = new ApiResponse<>(false, "Chỉ người thuê mới có thể đặt phòng", null);
+            } else {
+                response = ApiResponse.success(bookingService.createBooking(dto, tenantId));
+            }
+        } catch (Exception e) {
+            System.err.println("Lỗi khi tạo booking: " + e.getMessage());
+            e.printStackTrace();
+            response = new ApiResponse<>(false, "Lỗi backend: " + e.getMessage(), null);
         }
-
-        if (!"TENANT".equals(role)) {
-            return new ApiResponse<>(false, "Chỉ người thuê mới có thể đặt phòng", null);
-        }
-
-        return ApiResponse.success(bookingService.createBooking(dto, tenantId));
+        System.out.println("Response trả về FE: " + response);
+        return response;
     }
 
     // TENANT xem hợp đồng

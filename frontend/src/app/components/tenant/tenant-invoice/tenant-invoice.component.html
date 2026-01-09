@@ -23,7 +23,7 @@
         </div>
 
         <div class="card-actions" *ngIf="inv.status !== 'PAID'">
-          <button class="btn-vnpay" (click)="handlePayment(inv.id)">
+          <button class="btn-vnpay" (click)="paymentVnpay(inv.id)">
             <img src="https://sandbox.vnpayment.vn/paymentv2/Images/brands/logo-vnpay.png" alt="vnpay" height="20">
             Thanh toán ngay
           </button>

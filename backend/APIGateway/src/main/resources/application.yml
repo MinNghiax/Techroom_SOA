@@ -40,7 +40,7 @@ spring:
           predicates:
             - Path=/api/bookings/**, /api/contracts/**
 
-        # 4. INVOICE SERVICE (Port 8083) - Đặt phòng, hợp đồng, thanh toán
+        # 4. INVOICE SERVICE (Port 8084) - Đặt phòng, hợp đồng, thanh toán
         - id: invoice-service
           uri: lb://INVOICE-SERVICE
           predicates:

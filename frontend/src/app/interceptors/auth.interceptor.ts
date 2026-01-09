@@ -10,15 +10,35 @@ import { catchError, throwError } from 'rxjs';
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
 
-  return next(req).pipe(
+  const token = localStorage.getItem('accessToken');
+  let authReq = req;
+
+    if (typeof window !== 'undefined' && window.location && window.location.hostname === 'localhost') {
+      console.log('[AuthInterceptor] Request:', req.url, 'Token:', token ? '[Có token]' : '[KHÔNG có token]');
+    }
+
+    if (token) {
+      authReq = req.clone({
+        setHeaders: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      if (typeof window !== 'undefined' && window.location && window.location.hostname === 'localhost') {
+        console.log('[AuthInterceptor] Đã gắn Authorization:', `Bearer ${token.substring(0, 10)}...`);
+      }
+    } else {
+      if (typeof window !== 'undefined' && window.location && window.location.hostname === 'localhost') {
+        console.warn('[AuthInterceptor] KHÔNG tìm thấy accessToken khi gửi request:', req.url);
+      }
+    }
+
+  return next(authReq).pipe(
     catchError((error) => {
       // Nếu backend trả về 403 và message là "Tài khoản đã bị khóa"
       if (error.status === 403) {
         const errorMessage = error.error?.message || '';
         
-        // Check nếu message chứa từ khóa về tài khoản bị khóa
         if (errorMessage.includes('khóa') || errorMessage.toLowerCase().includes('banned')) {
-          // Xóa tất cả thông tin đăng nhập
           localStorage.removeItem('accessToken');
           localStorage.removeItem('userRole');
           localStorage.removeItem('username');

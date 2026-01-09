@@ -46,7 +46,22 @@ export class AuthService {
    * Đăng nhập
    */
   login(data: LoginRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, data);
+    return new Observable<AuthResponse>((observer) => {
+      this.http.post<AuthResponse>(`${this.apiUrl}/login`, data).subscribe({
+        next: (res) => {
+          // Lưu accessToken và role vào localStorage
+          localStorage.setItem('accessToken', res.accessToken);
+          localStorage.setItem('role', res.role); 
+          localStorage.setItem('username', res.username);
+          if (res.fullName) localStorage.setItem('fullName', res.fullName);
+          observer.next(res);
+          observer.complete();
+        },
+        error: (err) => {
+          observer.error(err);
+        }
+      });
+    });
   }
 
   /**

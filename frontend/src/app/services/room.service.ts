@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { RoomResponse, RoomRequest, Amenity } from '../models/room.model';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
+import { tap, catchError } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class RoomService {
@@ -16,8 +17,24 @@ export class RoomService {
 
   getRoomsByLandlord(): Observable<RoomResponse[]> {
     const landlordId = localStorage.getItem('userId');
-    const headers = new HttpHeaders().set('X-User-Id', landlordId ? landlordId : '');
-    return this.http.get<RoomResponse[]>(`${this.apiUrl}/landlord`, { headers });
+    const userRole = localStorage.getItem('userRole');
+    let headers = new HttpHeaders();
+    if (landlordId) headers = headers.set('X-User-Id', landlordId);
+    if (userRole) headers = headers.set('X-User-Role', userRole);
+    console.log('[RoomService] getRoomsByLandlord headers:', {
+      'X-User-Id': landlordId,
+      'X-User-Role': userRole
+    });
+    return this.http.get<RoomResponse[]>(`${this.apiUrl}/landlord`, { headers })
+      .pipe(
+        tap((res) => {
+          console.log('[RoomService] getRoomsByLandlord response:', res);
+        }),
+        catchError((err) => {
+          console.error('[RoomService] getRoomsByLandlord error:', err);
+          throw err;
+        })
+      );
   }
 
   getRoomById(id: number): Observable<RoomResponse> {
