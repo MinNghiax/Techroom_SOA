@@ -1,13 +1,13 @@
 import { Routes } from '@angular/router';
+import { MainLayoutComponent } from './layouts/main-layout/main-layout.component';
+import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.component';
+
+// Các imports component khác của bạn giữ nguyên
 import { HomeComponent } from './components/home/home.component';
 import { RoomListComponent } from './components/room-list/room-list.component';
 import { RoomDetailComponent } from './components/room-detail/room-detail.component';
-import { BuildingListComponent } from './components/building-list/building-list.component';
 import { LoginComponent } from './components/auth/login/login.component';
 import { RegisterComponent } from './components/auth/register/register.component';
-
-// IMPORT CÁC GUARD Ở ĐÂY
-import { adminGuard, landlordGuard, tenantGuard } from './guards/auth.guard';
 import { StatisticsComponent } from './components/admin/statistics/statistics.component';
 import { MyBookingsComponent } from './components/tenant/my-bookings/my-bookings.component';
 import { ManageRoomsComponent } from './components/landlord/manage-rooms/manage-rooms.component';
@@ -20,50 +20,59 @@ import { TenantInvoiceComponent } from './components/tenant/tenant-invoice/tenan
 import { LandlordInvoiceComponent } from './components/landlord/landlord-invoice/landlord-invoice.component';
 import { LandlordRequestComponent } from './components/landlord-request/landlord-request.component';
 import { LandlordRequestsComponent } from './components/admin/landlord-requests/landlord-requests.component';
-
+import { adminGuard, landlordGuard, tenantGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
-  { path: '', component: HomeComponent },
-  { path: 'rooms', component: RoomListComponent },
-  { path: 'rooms/:id', component: RoomDetailComponent },
-
-  // Nhóm các route cho Tenant (Role 2)
-  { 
-    path: 'tenant', 
-    canActivate: [tenantGuard],
+  // 1. Giao diện người dùng (Header ngang)
+  {
+    path: '',
+    component: MainLayoutComponent,
     children: [
-      { path: 'my-bookings', component: MyBookingsComponent },
-      { path: 'tenant-invoices', component: TenantInvoiceComponent }
+      { path: '', component: HomeComponent },
+      { path: 'rooms', component: RoomListComponent },
+      { path: 'rooms/:id', component: RoomDetailComponent },
+      { path: 'login', component: LoginComponent },
+      { path: 'register', component: RegisterComponent },
+      { path: 'landlord-request', component: LandlordRequestComponent },
+      { path: 'tenant/vnpay-return', component: VnpayReturnComponent },
+      
+      // Tenant Routes
+      {
+        path: 'tenant',
+        canActivate: [tenantGuard],
+        children: [
+          { path: 'my-bookings', component: MyBookingsComponent },
+          { path: 'tenant-invoices', component: TenantInvoiceComponent }
+        ]
+      },
+      
+      // Landlord Routes
+      {
+        path: 'landlord',
+        canActivate: [landlordGuard],
+        children: [
+          { path: 'manage-rooms', component: ManageRoomsComponent },
+          { path: 'manage-buildings', component: ManageBuildingsComponent },
+          { path: 'contract-management', component: ContractManagementComponent },
+          { path: 'landlord-invoices', component: LandlordInvoiceComponent }
+        ]
+      }
     ]
   },
-  { 
-    path: 'landlord', 
-    canActivate: [landlordGuard],
-    children: [
-      { path: 'manage-rooms', component: ManageRoomsComponent },
-      { path: 'manage-buildings', component: ManageBuildingsComponent },
-      { path: 'contract-management', component: ContractManagementComponent },
-      { path: 'landlord-invoices', component: LandlordInvoiceComponent }
-    ]
-  },
 
-  { path: 'landlord-request', component: LandlordRequestComponent },
-  { 
-    path: 'admin', 
+  // 2. Giao diện Admin (Sidebar dọc)
+  {
+    path: 'admin',
+    component: AdminLayoutComponent,
     canActivate: [adminGuard],
     children: [
-      { path: 'users', component: AdminUsersComponent },
       { path: 'statistics', component: StatisticsComponent },
+      { path: 'users', component: AdminUsersComponent },
       { path: 'reports', component: AdminReportComponent },
-      { path: 'landlord-requests', component: LandlordRequestsComponent }
+      { path: 'landlord-requests', component: LandlordRequestsComponent },
+      { path: '', redirectTo: 'statistics', pathMatch: 'full' }
     ]
   },
 
-  { path: 'login', component: LoginComponent },
-  { path: 'register', component: RegisterComponent },
-  { path: '**', redirectTo: '' },
-
-  { path: 'tenant/vnpay-return', component: VnpayReturnComponent }
-
-  
+  { path: '**', redirectTo: '' }
 ];

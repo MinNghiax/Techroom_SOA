@@ -1,0 +1,53 @@
+<div class="admin-wrapper">
+  <aside class="sidebar">
+    <a routerLink="/" class="logo-box">
+      <span class="tech">TECH</span><span class="room">ROOM</span>
+      <span class="badge">ADMIN</span>
+    </a>
+
+    <nav class="sidebar-menu">
+      <a routerLink="/admin/statistics" routerLinkActive="active" class="menu-item">
+        <i class="bi bi-speedometer2 icon"></i> 
+        <span>Thống kê</span>
+      </a>
+
+            
+      <a routerLink="/admin/users" routerLinkActive="active" class="menu-item">
+        <i class="bi bi-people-fill icon"></i>
+        <span>Quản lý người dùng</span>
+      </a>
+      
+      <a routerLink="/admin/landlord-requests" routerLinkActive="active" class="menu-item">
+        <i class="bi bi-person-check-fill icon"></i>
+        <span>Duyệt chủ trọ</span>
+      </a>
+      
+      <a routerLink="/admin/reports" routerLinkActive="active" class="menu-item">
+        <i class="bi bi-exclamation-triangle-fill icon"></i>
+        <span>Xử lý báo cáo</span>
+      </a>
+
+    </nav>
+
+    <div class="sidebar-footer">
+      <button (click)="logout()" class="btn-logout">
+        <i class="bi bi-box-arrow-right icon"></i>
+        <span>Đăng xuất</span>
+      </button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="top-header">
+      <h2 class="page-title">Hệ thống quản trị</h2>
+      <div class="admin-profile">
+        <span>Xin chào, Admin</span>
+        <div class="avatar">A</div>
+      </div>
+    </header>
+
+    <div class="content-body">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>
