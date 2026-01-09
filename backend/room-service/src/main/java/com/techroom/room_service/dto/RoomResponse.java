@@ -13,6 +13,7 @@ public class RoomResponse {
     private Double price;
     private Double area;
     private String status;
+    private String tenantName;
     private String address;
     private Integer buildingId;
     private String buildingName;

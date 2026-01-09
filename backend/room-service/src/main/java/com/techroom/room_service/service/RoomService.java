@@ -52,12 +52,17 @@ public class RoomService {
     private RoomResponse processRoomSave(Room room, RoomRequest request, List<MultipartFile> files) {
         room.setBuilding(buildingRepository.findById(request.getBuildingId())
                 .orElseThrow(() -> new RuntimeException("Tòa nhà không tồn tại")));
-
+        RoomStatus newStatus = RoomStatus.valueOf(request.getStatus().toUpperCase());
+        if (room.getId() != null) {
+            if (room.getStatus() == RoomStatus.OCCUPIED && newStatus == RoomStatus.AVAILABLE) {
+                throw new RuntimeException("Phòng đang có người ở, không thể chuyển trực tiếp về trạng thái trống. Vui lòng chuyển sang Đang sửa chữa!");
+            }
+        }
         room.setName(request.getName());
         room.setPrice(request.getPrice());
         room.setArea(request.getArea());
         room.setDescription(request.getDescription());
-        room.setStatus(RoomStatus.valueOf(request.getStatus().toUpperCase()));
+        room.setStatus(newStatus);
 
         // Lưu danh sách tiện ích từ mảng ID gửi lên
         if (request.getAmenityIds() != null) {
@@ -112,6 +117,7 @@ public class RoomService {
                 .imageUrls(room.getImages() != null ?
                         room.getImages().stream().map(RoomImage::getImageUrl).toList() : List.of())
                 .amenities(room.getAmenities())
+                .tenantName(room.getTenantName() != null ? room.getTenantName() : "---")
                 .build();
     }
 

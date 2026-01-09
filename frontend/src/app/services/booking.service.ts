@@ -29,6 +29,7 @@
       });
   }
 
+
     // 1. Tạo mới booking
     createBooking(dto: BookingDTO): Observable<ApiResponse<Contract>> {
       return this.http.post<ApiResponse<Contract>>(this.apiUrl, dto, { headers: this.getHeaders() });
